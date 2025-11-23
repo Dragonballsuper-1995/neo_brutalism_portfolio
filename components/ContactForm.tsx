@@ -41,18 +41,38 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSuccess, onError }) => {
     }
 
     setIsSubmitting(true);
-    // Simulate network request
-    await new Promise(resolve => setTimeout(resolve, 1500));
     
-    setIsSent(true);
-    setIsSubmitting(false);
+    try {
+      const response = await fetch("https://formspree.io/f/xqagjnpj", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(contactForm)
+      });
 
-    // Wait a few seconds to show the confetti/success message before closing
-    setTimeout(() => {
-        onSuccess(contactForm.name);
-        setContactForm({ name: '', email: '', message: '' });
-        setIsSent(false); // Reset for next time
-    }, 3500);
+      if (response.ok) {
+        setIsSent(true);
+        // Wait a few seconds to show the confetti/success message before closing
+        setTimeout(() => {
+            onSuccess(contactForm.name);
+            setContactForm({ name: '', email: '', message: '' });
+            setIsSent(false); // Reset for next time
+        }, 3500);
+      } else {
+        const data = await response.json();
+        if (data.errors && data.errors.length > 0) {
+           onError(data.errors.map((err: any) => err.message).join(", "));
+        } else {
+           onError("There was a problem sending your message.");
+        }
+      }
+    } catch (error) {
+       onError("Network error. Please try again later.");
+    } finally {
+       setIsSubmitting(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
