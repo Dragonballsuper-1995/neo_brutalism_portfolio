@@ -3,7 +3,7 @@
 ![Neo-Brutalist Portfolio Banner](image.png)
 > **"Tech Nerd with a Human Touch."**
 
-[![Portfolio](https://img.shields.io/badge/Portfolio-000000?style=for-the-badge&logo=github&logoColor=white&labelColor=1a1a1a)](https://sujal-sanjay-chhajed.vercel.app/)
+[![Portfolio](https://img.shields.io/badge/Portfolio-000000?style=for-the-badge&logo=github&logoColor=white&labelColor=1a1a1a)](https://sujal-chhajed.vercel.app/)
 
 Welcome to the digital playground of **Sujal Sanjay Chhajed**, an **AI Developer & ML Engineer** based in Chennai, India. 
 
