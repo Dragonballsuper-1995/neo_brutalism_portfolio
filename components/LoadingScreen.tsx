@@ -34,7 +34,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete, name }) => {
         // --- Progress Bar Animation using requestAnimationFrame for smoothness ---
         let startTime: number | null = null;
         let animationFrameId: number;
-        const duration = 1000; // Target duration for progress bar: 1 second
+        const duration = 2000; // Increased to 2 seconds for better visibility
 
         const animateProgress = (timestamp: number) => {
             if (!startTime) startTime = timestamp;
@@ -53,7 +53,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete, name }) => {
                 setTimeout(() => {
                     setIsCompleting(true);
                     onComplete();
-                }, 200); // Reduced delay at 100%
+                }, 200); 
             }
         };
 
@@ -89,9 +89,9 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete, name }) => {
                 
                 {/* Progress Bar Container */}
                 <div className="w-full max-w-md h-4 bg-gray-900 mt-8 border-4 border-white">
-                    {/* Actual Filling Bar */}
+                    {/* Actual Filling Bar - Removed transition to fix sync issue with JS animation */}
                     <div 
-                        className="h-full bg-white transition-all duration-150 ease-linear" 
+                        className="h-full bg-white" 
                         style={{ width: `${progress}%` }}
                     ></div>
                 </div>

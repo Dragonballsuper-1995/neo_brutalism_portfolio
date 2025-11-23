@@ -1,115 +1,142 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import Section from './Section';
-import ProjectCard from './ProjectCard';
-import ProjectSkeleton from './ProjectSkeleton';
-import { NavSection, Project } from '../types';
-import { PROJECTS } from '../constants';
+import React from 'react';
+import { Github, ExternalLink } from 'lucide-react';
+import { Project } from '../types';
+import Tooltip from './Tooltip';
 
-// This hook is needed here now because it depends on the filter changing
-const useProjectScrollReveal = (dependency: any) => {
-  useEffect(() => {
-    // Reset visibility for re-animation on filter change
-    document.querySelectorAll('.reveal-on-scroll.is-visible').forEach(el => {
-      // We only want to reset project cards
-      if (el.closest(`#${NavSection.PROJECTS}`)) {
-        el.classList.remove('is-visible');
-      }
-    });
+interface ProjectCardProps {
+  project: Project;
+  index: number;
+}
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
+  // Swapped indices to ensure ID 3 (YouTube) maps to Pink when using (id-1) % length
+  // ID 1 (FPL) -> Index 0 -> Yellow
+  // ID 2 (Urban) -> Index 1 -> Orange
+  // ID 3 (YouTube) -> Index 2 -> Pink
+  // ID 4 (Anom) -> Index 3 -> Blue
+  const shadowColors = [
+    '#FFDE59', // Yellow
+    '#FF914D', // Orange
+    '#FF66C4', // Pink
+    '#5CE1E6', // Blue
+    '#7ED957', // Green
+    '#8C52FF'  // Purple
+  ];
+  
+  // Use project.id instead of index to ensure stable colors when filtering
+  const colorIndex = (project.id - 1) % shadowColors.length;
+  const shadowColor = shadowColors[colorIndex];
+  
+  const marqueeTags = [...project.tags, ...project.tags, ...project.tags, ...project.tags];
 
-    const timeoutId = setTimeout(() => {
-      document.querySelectorAll(`#${NavSection.PROJECTS} .reveal-on-scroll`).forEach((el) => observer.observe(el));
-    }, 100);
-
-    return () => {
-      observer.disconnect();
-      clearTimeout(timeoutId);
+  const getWatermarkText = (category: string) => {
+    const mapping: { [key: string]: string } = {
+      'Data Science': 'DATA SCI',
+      'Web Dev': 'WEB DEV',
+      'AI/ML': 'AI/ML',
+      'Frontend': 'FRONTEND',
+      'Backend': 'BACKEND',
+      'Fullstack': 'FULLSTACK',
+      'Mobile': 'MOBILE',
     };
-  }, [dependency]);
-};
+    return mapping[category] || category.toUpperCase();
+  };
 
-
-const ProjectsSection: React.FC = () => {
-  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
-  const [loadedProjects, setLoadedProjects] = useState<Project[]>([]);
-  const [activeCategory, setActiveCategory] = useState('All');
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoadedProjects(PROJECTS);
-      setIsLoadingProjects(false);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const categories = useMemo(() => ['All', ...Array.from(new Set(PROJECTS.map(p => p.category)))], []);
-
-  const filteredProjects = useMemo(() => loadedProjects.filter(project =>
-    activeCategory === 'All' || project.category === activeCategory
-  ), [loadedProjects, activeCategory]);
-
-  useProjectScrollReveal(isLoadingProjects || activeCategory);
+  const watermarkText = getWatermarkText(project.category);
 
   return (
-    <Section id={NavSection.PROJECTS}>
-      <div className="flex flex-col items-center mb-8 reveal-on-scroll">
-        <h2 className="text-5xl md:text-6xl font-black uppercase mb-4 text-center dark:text-neo-dark-text">
-          Featured <span className="text-neo-purple">Works</span>
-        </h2>
+    <div 
+      className="group relative h-full bg-white dark:bg-neo-dark-surface border-4 border-black dark:border-neo-dark-border p-6 md:p-8 flex flex-col overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_var(--shadow-col)] will-change-transform transform-gpu"
+      style={{ '--shadow-col': shadowColor } as React.CSSProperties}
+    >
+      {/* Watermark */}
+      <div className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none z-0">
+        <span className="font-sans font-black text-7xl sm:text-8xl md:text-9xl text-black/[.04] dark:text-neo-dark-border/[.04] whitespace-nowrap select-none -rotate-12 transform-gpu">
+          {watermarkText}
+        </span>
       </div>
-      <div className="flex flex-wrap justify-center gap-4 mb-12 reveal-on-scroll px-4">
-        {categories.map((category) => (
-          <button
-            key={category}
-            onClick={() => setActiveCategory(category)}
-            className={`
-              px-6 py-2 font-mono font-bold border-2 border-black dark:border-neo-dark-border transition-all text-sm md:text-base uppercase tracking-wider
-              ${activeCategory === category
-                ? 'bg-neo-black text-white dark:bg-neo-dark-border dark:text-neo-dark-bg shadow-[2px_2px_0px_0px_rgba(126,217,87,1)] translate-x-[2px] translate-y-[2px]'
-                : 'bg-white dark:bg-neo-dark-surface text-black dark:text-neo-dark-text shadow-neo dark:shadow-neo-dark hover:-translate-y-1 hover:bg-neo-green dark:hover:bg-neo-purple hover:text-black hover:shadow-neo-lg dark:hover:shadow-neo-lg-dark'
-              }
-            `}
+      
+      {/* Pattern Background */}
+      <div 
+        className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500 bg-[radial-gradient(#000_1px,transparent_1px)] dark:bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none z-0"
+      />
+
+      {/* Header: Index & Category */}
+      <div className="flex justify-between items-start mb-4 relative z-10">
+        <span className="font-mono text-sm font-bold text-gray-500 dark:text-neo-dark-text-muted uppercase tracking-widest">
+          {String(index + 1).padStart(2, '0')} // {project.category}
+        </span>
+      </div>
+
+      {/* Title */}
+      <h3 className="text-3xl md:text-4xl font-black uppercase leading-[0.9] mb-4 text-black dark:text-neo-dark-text group-hover:text-[var(--shadow-col)] transition-colors duration-300 relative z-10 break-words">
+        {project.title}
+      </h3>
+
+      {/* Description */}
+      <p className="font-mono text-sm text-gray-700 dark:text-neo-dark-text-muted mb-6 leading-relaxed relative z-10 flex-grow">
+        {project.description}
+      </p>
+
+      {/* Tags (Animated Marquee) */}
+      <div className="mb-8 relative z-10 w-full overflow-hidden">
+        <div className="flex w-max transform-gpu">
+           {/* First Strip */}
+           <div className="flex shrink-0 animate-marquee gap-2 pr-2 group-hover:[animation-play-state:paused] will-change-transform">
+             {marqueeTags.map((tag, i) => (
+               <span key={`t1-${i}`} className="border-2 border-black dark:border-neo-dark-border px-2 py-1 text-[10px] md:text-xs font-bold uppercase bg-transparent text-black dark:text-neo-dark-text hover:bg-neo-yellow hover:text-black transition-colors cursor-default whitespace-nowrap">
+                   {tag}
+               </span>
+             ))}
+           </div>
+           {/* Duplicate Strip for seamless loop */}
+           <div className="flex shrink-0 animate-marquee gap-2 pr-2 group-hover:[animation-play-state:paused] will-change-transform" aria-hidden="true">
+             {marqueeTags.map((tag, i) => (
+               <span key={`t2-${i}`} className="border-2 border-black dark:border-neo-dark-border px-2 py-1 text-[10px] md:text-xs font-bold uppercase bg-transparent text-black dark:text-neo-dark-text hover:bg-neo-yellow hover:text-black transition-colors cursor-default whitespace-nowrap">
+                   {tag}
+               </span>
+             ))}
+           </div>
+        </div>
+      </div>
+
+      {/* Footer Buttons Side-by-Side */}
+      <div className="mt-auto grid grid-cols-2 gap-3 relative z-10">
+        {/* Live Demo Button */}
+        <Tooltip text="Open Live Demo" className="w-full">
+          <a 
+            href={project.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 border-4 border-black dark:border-neo-dark-border py-3 px-2 font-black uppercase text-xs md:text-sm bg-white dark:bg-neo-dark-bg text-black dark:text-neo-dark-text hover:bg-neo-green hover:text-black transition-colors group/btn w-full"
           >
-            {category}
-          </button>
-        ))}
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 min-h-[600px] content-start">
-        {isLoadingProjects ? (
-          Array.from({ length: 4 }).map((_, index) => (
-            <ProjectSkeleton key={`skeleton-${index}`} />
-          ))
-        ) : (
-          filteredProjects.map((project, index) => (
-            <div key={project.id} className="h-full">
-              <div className="reveal-on-scroll h-full" style={{ transitionDelay: `${index * 150}ms` }}>
-                <ProjectCard project={project} index={index} />
-              </div>
-            </div>
-          ))
-        )}
-        {!isLoadingProjects && filteredProjects.length === 0 && (
-          <div className="col-span-1 md:col-span-2 text-center py-20 border-4 border-black dark:border-neo-dark-border bg-white dark:bg-neo-dark-surface shadow-neo dark:shadow-neo-dark reveal-on-scroll">
-            <p className="font-mono text-xl mb-2">No projects found in this category.</p>
-            <button
-              onClick={() => setActiveCategory('All')}
-              className="text-neo-purple underline font-bold hover:text-neo-pink"
+            <span>Live Demo</span>
+            <ExternalLink size={16} className="group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5 transition-transform" />
+          </a>
+        </Tooltip>
+
+        {/* Source Code Button */}
+        {project.github ? (
+           <Tooltip text="View Source Code" className="w-full">
+             <a 
+              href={project.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 border-4 border-black dark:border-neo-dark-border py-3 px-2 font-black uppercase text-xs md:text-sm bg-white dark:bg-neo-dark-bg text-black dark:text-neo-dark-text hover:bg-neo-blue hover:text-black transition-colors group/btn2 w-full"
             >
-              View all projects
-            </button>
+              <span>Source</span>
+              <Github size={16} className="group-hover/btn2:-translate-y-0.5 group-hover/btn2:translate-x-0.5 transition-transform" />
+            </a>
+           </Tooltip>
+        ) : (
+          <div className="flex items-center justify-center border-4 border-gray-300 dark:border-gray-700 text-gray-400 py-3 px-2 font-black uppercase text-xs md:text-sm cursor-not-allowed w-full">
+            <span>Private</span>
           </div>
         )}
       </div>
-    </Section>
+
+    </div>
   );
 };
 
-export default React.memo(ProjectsSection);
+export default React.memo(ProjectCard);
