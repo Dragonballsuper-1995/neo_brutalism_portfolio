@@ -21,7 +21,7 @@ const About: React.FC = () => (
           <div className="relative border-4 border-black bg-white p-2 z-10">
             <div className="aspect-[4/5] overflow-hidden border-2 border-black relative">
               <img
-                src="./Assets/profile-pic-4.webp"
+                src="/profile-pic-4.webp"
                 alt="Sujal Chhajed"
                 className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-100 group-hover:scale-110"
                 loading="lazy"

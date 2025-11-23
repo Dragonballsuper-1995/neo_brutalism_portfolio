@@ -27,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({ theme, toggleTheme, activeSection, scro
           onClick={() => scrollToSection(NavSection.HERO)}
         >
           <img
-            src={theme === 'light' ? 'logo-light.svg' : 'logo-dark.svg'}
+            src={theme === 'light' ? '/logo-light.svg' : '/logo-dark.svg'}
             alt="Sujal Chhajed Logo"
             className="w-16 h-16 group-hover:scale-110 transition-transform flex-shrink-0"
             width="64"

@@ -65,13 +65,9 @@ const App: React.FC = () => {
   // Preload images
   useEffect(() => {
     const imageUrls = [
-      'logo-light.svg',
-      'logo-dark.svg',
-      './Assets/profile-pic-4.webp',
-      "./Assets/fpl-analytics-hub.webp",
-      "./Assets/urban-escapade.webp",
-      "./Assets/yt-title-desc-generator.webp",
-      "./Assets/anomlogbert.webp",
+      '/logo-light.svg',
+      '/logo-dark.svg',
+      '/profile-pic-4.webp',
       ...PROJECTS.map(p => p.image)
     ];
     imageUrls.forEach(url => { (new Image()).src = url; });
