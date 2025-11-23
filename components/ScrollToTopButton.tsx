@@ -1,0 +1,105 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowUp } from 'lucide-react';
+import Tooltip from './Tooltip';
+
+const ScrollToTopButton: React.FC = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const progressRectRef = useRef<SVGRectElement>(null);
+
+  // Square Progress Configuration
+  const size = 60; 
+  const strokeWidth = 4;
+  const rectSize = size - strokeWidth;
+  const perimeter = rectSize * 4;
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const winHeight = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+      
+      // Show button after scrolling down 100px
+      setIsVisible(scrollTop > 100);
+
+      // Calculate progress and update DOM directly
+      const totalScroll = docHeight - winHeight;
+      if (totalScroll > 0 && progressRectRef.current) {
+        const currentProgress = Math.min(1, Math.max(0, scrollTop / totalScroll));
+        const strokeDashoffset = perimeter - (currentProgress * perimeter);
+        progressRectRef.current.style.strokeDashoffset = `${strokeDashoffset}`;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <div 
+      className={`
+        fixed right-8 bottom-32 z-40 transition-all duration-500 ease-out
+        ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'}
+      `}
+    >
+      {/* 
+        We pass the hover animation class to the Tooltip wrapper. 
+        Since Tooltip now uses group/tooltip, this hover effect relies on the standard hover state 
+        of the div, which is correct. The position='left' ensures correct internal alignment.
+      */}
+      <Tooltip text="Scroll to Top" position="left" className="transition-transform duration-300 hover:-translate-y-2">
+        <button
+          onClick={scrollToTop}
+          className="
+            group relative flex items-center justify-center 
+            w-[60px] h-[60px] 
+            bg-neo-yellow dark:bg-neo-purple 
+            shadow-neo-lg dark:shadow-neo-lg-dark 
+            hover:shadow-neo-xl dark:hover:shadow-neo-xl 
+            transition-all duration-300
+          "
+          aria-label="Scroll to top"
+        >
+          {/* SVG Progress Border */}
+          <svg 
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            viewBox={`0 0 ${size} ${size}`}
+          >
+            <rect 
+              x={strokeWidth/2} 
+              y={strokeWidth/2} 
+              width={rectSize} 
+              height={rectSize} 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth={strokeWidth}
+              className="text-black dark:text-white" 
+            />
+            <rect 
+              ref={progressRectRef}
+              x={strokeWidth/2} 
+              y={strokeWidth/2} 
+              width={rectSize} 
+              height={rectSize} 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth={strokeWidth}
+              strokeDasharray={perimeter}
+              style={{ strokeDashoffset: perimeter }}
+              className="text-neo-pink transition-[stroke-dashoffset] duration-100"
+            />
+          </svg>
+
+          <ArrowUp size={28} strokeWidth={3} className="text-black dark:text-white relative z-10 group-hover:scale-110 transition-transform" />
+        </button>
+      </Tooltip>
+    </div>
+  );
+};
+
+export default React.memo(ScrollToTopButton);
