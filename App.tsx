@@ -62,15 +62,24 @@ const App: React.FC = () => {
     }, 500);
   }, []);
 
-  // Preload images
+  // Preload images optimized: Defer to idle time to prioritize FCP
   useEffect(() => {
-    const imageUrls = [
-      '/logo-light.svg',
-      '/logo-dark.svg',
-      '/profile-pic-4.webp',
-      ...PROJECTS.map(p => p.image)
-    ];
-    imageUrls.forEach(url => { (new Image()).src = url; });
+    const preloadImages = () => {
+      const imageUrls = [
+        'logo-light.svg',
+        'logo-dark.svg',
+        'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?q=80&w=800&auto-format=fit-crop',
+        ...PROJECTS.map(p => p.image)
+      ];
+      imageUrls.forEach(url => { (new Image()).src = url; });
+    };
+
+    // Use requestIdleCallback if available, otherwise fallback to timeout
+    if ('requestIdleCallback' in window) {
+       (window as any).requestIdleCallback(preloadImages);
+    } else {
+       setTimeout(preloadImages, 2000);
+    }
   }, []);
 
   useGlobalScrollReveal(!isLoading);
@@ -143,16 +152,17 @@ const App: React.FC = () => {
     showToast(errorMessage, 'error');
   }, [showToast]);
 
-  // Body scroll lock for modal
+  // Body scroll lock for modal and loader
   useEffect(() => {
-    const isModalOpen = isContactOpen || isChatOpen;
-    document.body.style.overflow = isModalOpen ? 'hidden' : '';
+    const shouldLock = isContactOpen || isChatOpen || isLoaderMounted;
+    document.body.style.overflow = shouldLock ? 'hidden' : '';
     
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         if (isContactOpen) setIsContactOpen(false);
       }
     };
+    
     if (isContactOpen) {
       window.addEventListener('keydown', handleKeyDown);
     }
@@ -160,7 +170,7 @@ const App: React.FC = () => {
         document.body.style.overflow = '';
         window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isContactOpen, isChatOpen]);
+  }, [isContactOpen, isChatOpen, isLoaderMounted]);
 
   return (
     <>
