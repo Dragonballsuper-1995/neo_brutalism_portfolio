@@ -30,7 +30,6 @@ export const PROJECTS: Project[] = [
     tags: ["Python", "Machine Learning", "GitHub Actions", "Pandas", "JavaScript", "Tailwind CSS", "Chart.js"],
     link: "https://dragonballsuper-1995.github.io/Fantasy_Premier_League_Analytics_Hub/",
     github: "https://github.com/Dragonballsuper-1995/Fantasy_Premier_League_Analytics_Hub",
-    image: "./Assets/fpl-analytics-hub.webp",
     category: "Data Science"
   },
   {
@@ -40,7 +39,6 @@ export const PROJECTS: Project[] = [
     tags: ["HTML5", "CSS3", "JavaScript", "Responsive Design"],
     link: "https://siddharth-y26.github.io/Urban-Escapade/",
     github: "https://github.com/Siddharth-Y26/Urban-Escapade",
-    image: "./Assets/urban-escapade.webp",
     category: "Web Dev"
   },
   {
@@ -50,7 +48,6 @@ export const PROJECTS: Project[] = [
     tags: ["T5 Model", "BART", "RAKE Algorithm", "Gradio UI"],
     link: "https://huggingface.co/spaces/SujalChhajed925/yt-title-desc-generator",
     github: "https://github.com/Dragonballsuper-1995/yt-title-desc-generator",
-    image: "./Assets/yt-title-desc-generator.webp",
     category: "AI/ML"
   },
   {
@@ -59,7 +56,6 @@ export const PROJECTS: Project[] = [
     description: "Deep learning framework for automated anomaly detection in system log files using transformer-based models.",
     tags: ["all-MiniLM-L12-v2", "Transformers", "Log Analysis", "Anomaly Detection"],
     link: "https://huggingface.co/spaces/ayush-shukla135/AnomLogBert",
-    github: "https://github.com/Ayushs135/AnomLogBert",
     image: "./Assets/anomlogbert.webp",
     category: "AI/ML"
   }
