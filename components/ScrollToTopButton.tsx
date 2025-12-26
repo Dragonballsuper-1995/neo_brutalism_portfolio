@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowUp } from 'lucide-react';
 import Tooltip from './Tooltip';
@@ -13,7 +14,9 @@ const ScrollToTopButton: React.FC = () => {
   const perimeter = rectSize * 4;
 
   useEffect(() => {
-    const handleScroll = () => {
+    let ticking = false;
+
+    const updateUI = () => {
       const scrollTop = window.scrollY;
       const winHeight = window.innerHeight;
       const docHeight = document.documentElement.scrollHeight;
@@ -28,13 +31,22 @@ const ScrollToTopButton: React.FC = () => {
         const strokeDashoffset = perimeter - (currentProgress * perimeter);
         progressRectRef.current.style.strokeDashoffset = `${strokeDashoffset}`;
       }
+      ticking = false;
+    };
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateUI);
+        ticking = true;
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    // Initial check
     handleScroll();
     
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [perimeter]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -43,15 +55,10 @@ const ScrollToTopButton: React.FC = () => {
   return (
     <div 
       className={`
-        fixed right-8 bottom-32 z-40 transition-all duration-500 ease-out
+        fixed right-6 bottom-[164px] md:right-8 md:bottom-32 z-40 transition-all duration-500 ease-out will-change-[transform,opacity] no-print
         ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'}
       `}
     >
-      {/* 
-        We pass the hover animation class to the Tooltip wrapper. 
-        Since Tooltip now uses group/tooltip, this hover effect relies on the standard hover state 
-        of the div, which is correct. The position='left' ensures correct internal alignment.
-      */}
       <Tooltip text="Scroll to Top" position="left" className="transition-transform duration-300 hover:-translate-y-2">
         <button
           onClick={scrollToTop}

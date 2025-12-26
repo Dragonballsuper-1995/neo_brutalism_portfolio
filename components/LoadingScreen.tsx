@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 
 interface LoadingScreenProps {
@@ -18,6 +19,7 @@ const loadingTexts = [
 const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete, name }) => {
     const [progress, setProgress] = useState(0);
     const [isCompleting, setIsCompleting] = useState(false);
+    const [isContentHidden, setIsContentHidden] = useState(false);
     const [statusText, setStatusText] = useState(loadingTexts[0]);
 
     // A single, optimized effect to handle all loading screen animations
@@ -34,7 +36,8 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete, name }) => {
         // --- Progress Bar Animation using requestAnimationFrame for smoothness ---
         let startTime: number | null = null;
         let animationFrameId: number;
-        const duration = 2000; // Increased to 2 seconds for better visibility
+        // Faster initial load (1.5s instead of 2.0s)
+        const duration = 1500; 
 
         const animateProgress = (timestamp: number) => {
             if (!startTime) startTime = timestamp;
@@ -49,11 +52,17 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete, name }) => {
                 // Animation finished
                 setProgress(100);
                 clearInterval(textInterval); // Stop cycling text
-                setStatusText('BOOT SEQUENCE COMPLETE.');
+                setStatusText('READY.');
+                
+                // 1. Tell App to render content underneath (opacity 0 -> 1)
+                onComplete();
+
+                // 2. Trigger fade out AND curtain lift almost simultaneously
+                // Small buffer (150ms) ensures the underlying app has painted
                 setTimeout(() => {
-                    setIsCompleting(true);
-                    onComplete();
-                }, 200); 
+                    setIsContentHidden(true); // Fade out text
+                    setIsCompleting(true);    // Lift curtain
+                }, 150);
             }
         };
 
@@ -70,37 +79,44 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete, name }) => {
     return (
         <div 
             className={`
-                fixed inset-0 z-[1000] bg-neo-black text-white flex flex-col justify-between p-8 font-sans
-                transition-transform duration-500 ease-in-out
+                fixed inset-0 z-[1000] bg-neo-black flex flex-col justify-between p-4 sm:p-8 font-sans
+                transition-transform duration-700 ease-[cubic-bezier(0.87,0,0.13,1)] will-change-transform
                 ${isCompleting ? '-translate-y-full' : 'translate-y-0'}
             `}
         >
-            {/* Top Label */}
-            <div className="text-xl font-bold tracking-tighter">
-                SYSTEM BOOT // V.2.0
-            </div>
-            
-            {/* Center Progress Display */}
-            <div className="flex flex-col items-center w-full">
-                {/* Percentage Text */}
-                <div className="text-[15vw] font-black leading-none">
-                    {progress}%
+            {/* Content Container - Fades out AS the slide moves up */}
+            <div className={`
+                flex flex-col justify-between h-full w-full text-white
+                transition-opacity duration-300 ease-out
+                ${isContentHidden ? 'opacity-0' : 'opacity-100'}
+            `}>
+                {/* Top Label */}
+                <div className="text-sm sm:text-xl font-bold tracking-tighter">
+                    SYSTEM BOOT // V.2.0
                 </div>
                 
-                {/* Progress Bar Container */}
-                <div className="w-full max-w-md h-4 bg-gray-900 mt-8 border-4 border-white">
-                    {/* Actual Filling Bar - Removed transition to fix sync issue with JS animation */}
-                    <div 
-                        className="h-full bg-white" 
-                        style={{ width: `${progress}%` }}
-                    ></div>
+                {/* Center Progress Display */}
+                <div className="flex flex-col items-center w-full">
+                    {/* Percentage Text */}
+                    <div className="text-[clamp(3.25rem,15vw,9rem)] font-black leading-none">
+                        {progress}%
+                    </div>
+                    
+                    {/* Progress Bar Container */}
+                    <div className="w-full max-w-md h-4 bg-gray-900 mt-4 sm:mt-8 border-4 border-white">
+                        {/* Actual Filling Bar */}
+                        <div 
+                            className="h-full bg-white transition-all duration-75 ease-linear" 
+                            style={{ width: `${progress}%` }}
+                        ></div>
+                    </div>
                 </div>
-            </div>
-            
-            {/* Bottom Status */}
-            <div className="flex justify-between text-sm font-mono w-full uppercase">
-                <span role="status" aria-live="polite">{statusText}</span>
-                <span>© {new Date().getFullYear()} {name}</span>
+                
+                {/* Bottom Status */}
+                <div className="flex justify-between text-[10px] sm:text-sm font-mono w-full uppercase pb-[env(safe-area-inset-bottom,0px)]">
+                    <span role="status" aria-live="polite">{statusText}</span>
+                    <span>© {new Date().getFullYear()} {name}</span>
+                </div>
             </div>
         </div>
     );

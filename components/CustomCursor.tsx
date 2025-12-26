@@ -1,27 +1,68 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-const CustomCursor: React.FC = () => {
+interface CustomCursorProps {
+  /**
+   * Forces a high-contrast cursor style (no blend mode).
+   * Useful on semi-transparent backdrops where `mix-blend-difference` can vanish.
+   */
+  highContrast?: boolean;
+}
+
+const CustomCursor: React.FC<CustomCursorProps> = ({ highContrast = false }) => {
   const cursorRef = useRef<HTMLDivElement>(null);
   const followerRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(false);
+
+  const blendModeClass = highContrast ? 'mix-blend-normal' : 'mix-blend-difference';
+  const strokeClass = highContrast ? 'bg-neo-black' : 'bg-white';
+  const ringBorderClass = highContrast ? 'border-neo-black' : 'border-white';
+  const ringHoverBgClass = highContrast ? 'bg-neo-black/10' : 'bg-white/10';
+
+  // React to DevTools device toggles / pointer changes.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const mql = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const apply = () => setIsEnabled(mql.matches);
+    apply();
+
+    const onChange = () => apply();
+    // Safari support
+    if ('addEventListener' in mql) {
+      mql.addEventListener('change', onChange);
+      return () => mql.removeEventListener('change', onChange);
+    }
+    // eslint-disable-next-line deprecation/deprecation
+    mql.addListener(onChange);
+    // eslint-disable-next-line deprecation/deprecation
+    return () => mql.removeListener(onChange);
+  }, []);
 
   useEffect(() => {
-    // Disable on touch devices
-    if (window.matchMedia("(pointer: coarse)").matches) return;
+    if (typeof window === 'undefined') return;
+
+    // Toggle native cursor hiding only when the custom cursor is active.
+    document.body.classList.toggle('has-custom-cursor', isEnabled);
+
+    if (!isEnabled) {
+      setIsVisible(false);
+      setIsHovering(false);
+      setIsClicked(false);
+      return;
+    }
 
     const moveCursor = (e: MouseEvent) => {
-      if (!isVisible) setIsVisible(true);
-      
+      setIsVisible(true);
+
       const { clientX, clientY } = e;
-      
-      // Inner cursor moves instantly (Positioning only)
+
       if (cursorRef.current) {
         cursorRef.current.style.transform = `translate3d(${clientX}px, ${clientY}px, 0)`;
       }
-      
-      // Outer follower moves with a slight delay/smoothing via CSS transition
+
       if (followerRef.current) {
         followerRef.current.style.transform = `translate3d(${clientX}px, ${clientY}px, 0)`;
       }
@@ -29,17 +70,15 @@ const CustomCursor: React.FC = () => {
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const isInteractive = 
+      const isInteractive =
         target.matches('a, button, input, textarea, [role="button"], select') ||
         target.closest('a, button, input, textarea, [role="button"], select');
-      
+
       setIsHovering(!!isInteractive);
     };
 
     const handleMouseDown = () => setIsClicked(true);
     const handleMouseUp = () => setIsClicked(false);
-    
-    // Hide cursor when leaving window
     const handleMouseLeave = () => setIsVisible(false);
     const handleMouseEnter = () => setIsVisible(true);
 
@@ -57,13 +96,11 @@ const CustomCursor: React.FC = () => {
       window.removeEventListener('mouseup', handleMouseUp);
       document.removeEventListener('mouseleave', handleMouseLeave);
       document.removeEventListener('mouseenter', handleMouseEnter);
+      document.body.classList.remove('has-custom-cursor');
     };
-  }, [isVisible]);
+  }, [isEnabled]);
 
-  // Don't render on server or touch devices
-  if (typeof window !== 'undefined' && window.matchMedia("(pointer: coarse)").matches) {
-    return null;
-  }
+  if (!isEnabled) return null;
 
   return (
     <>
@@ -71,7 +108,7 @@ const CustomCursor: React.FC = () => {
       <div 
         ref={cursorRef}
         aria-hidden="true"
-        className="fixed top-0 left-0 z-[10000] pointer-events-none mix-blend-difference"
+        className={`fixed top-0 left-0 z-[10000] pointer-events-none ${blendModeClass}`}
       >
         {/* Visual Crosshair Element */}
         <div className={`
@@ -81,8 +118,8 @@ const CustomCursor: React.FC = () => {
           ${isHovering ? 'scale-150 rotate-90' : 'scale-100'}
           ${isClicked ? 'scale-75' : ''}
         `}>
-          <div className="absolute top-1/2 left-0 w-full h-[2px] bg-white -translate-y-1/2" />
-          <div className="absolute top-1/2 left-0 w-full h-[2px] bg-white -translate-y-1/2 rotate-90" />
+          <div className={`absolute top-1/2 left-0 w-full h-[2px] -translate-y-1/2 ${strokeClass}`} />
+          <div className={`absolute top-1/2 left-0 w-full h-[2px] -translate-y-1/2 rotate-90 ${strokeClass}`} />
         </div>
       </div>
       
@@ -92,14 +129,14 @@ const CustomCursor: React.FC = () => {
         aria-hidden="true"
         className={`
           fixed top-0 left-0 z-[9999] pointer-events-none
-          border-2 border-white
-          mix-blend-difference
+          border-2 ${ringBorderClass}
+          ${blendModeClass}
           rounded-full
           flex items-center justify-center
           transition-all duration-150 ease-out
           -ml-6 -mt-6
           ${!isVisible ? 'opacity-0' : 'opacity-100'}
-          ${isHovering ? 'w-16 h-16 bg-white/10 -ml-8 -mt-8' : 'w-12 h-12'}
+          ${isHovering ? `w-16 h-16 ${ringHoverBgClass} -ml-8 -mt-8` : 'w-12 h-12'}
           ${isClicked ? 'scale-75' : 'scale-100'}
         `}
       />

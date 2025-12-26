@@ -1,225 +1,25 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-g" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Neo-Brutalist Portfolio</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            fontFamily: {
-              mono: ['"Space Mono"', 'Courier New', 'monospace'],
-              sans: ['"Archivo Black"', 'Verdana', 'sans-serif'],
-            },
-            colors: {
-              neo: {
-                yellow: '#FFDE59',
-                orange: '#FF914D',
-                green: '#7ED957',
-                blue: '#5CE1E6',
-                pink: '#FF66C4',
-                purple: '#8C52FF',
-                black: '#050505',
-                white: '#FAFAFA',
-                dark: {
-                  bg: '#111827',
-                  surface: '#1F2937',
-                  border: '#FAFAFA',
-                  text: '#FAFAFA',
-                  'text-muted': '#9CA3AF',
-                }
-              }
-            },
-            boxShadow: {
-              'neo': '4px 4px 0px 0px rgba(0,0,0,1)',
-              'neo-sm': '2px 2px 0px 0px rgba(0,0,0,1)',
-              'neo-lg': '8px 8px 0px 0px rgba(0,0,0,1)',
-              'neo-xl': '12px 12px 0px 0px rgba(0,0,0,1)',
-              'neo-dark': '4px 4px 0px 0px #FAFAFA',
-              'neo-sm-dark': '2px 2px 0px 0px #FAFAFA',
-              'neo-lg-dark': '8px 8px 0px 0px #FAFAFA',
-            },
-            animation: {
-              'marquee': 'marquee 25s linear infinite',
-              'marquee-reverse': 'marqueeReverse 25s linear infinite',
-              'blob': 'blob 7s infinite',
-              'glitch': 'glitch 1s linear infinite',
-              'spin-slow': 'spin 8s linear infinite',
-            },
-            keyframes: {
-              marquee: {
-                '0%': { transform: 'translateX(0)' },
-                '100%': { transform: 'translateX(-100%)' },
-              },
-              marqueeReverse: {
-                '0%': { transform: 'translateX(-100%)' },
-                '100%': { transform: 'translateX(0)' },
-              },
-              blob: {
-                '0%': { transform: 'translate(0px, 0px) scale(1)' },
-                '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
-                '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
-                '100%': { transform: 'translate(0px, 0px) scale(1)' },
-              },
-              glitch: {
-                '2%, 64%': { transform: 'translate(2px,0) skew(0deg)' },
-                '4%, 60%': { transform: 'translate(-2px,0) skew(0deg)' },
-                '62%': { transform: 'translate(0,0) skew(5deg)' },
-              },
-              slideIn: {
-                '0%': { opacity: '0', transform: 'translateY(20px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' },
-              },
-              slideDown: {
-                '0%': { opacity: '0', transform: 'translateY(-20px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' },
-              },
-              fadeIn: {
-                '0%': { opacity: '0' },
-                '100%': { opacity: '1' },
-              }
-            }
-          },
-        },
-      }
-    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <style>
-      /* Global Smooth Scroll */
-      html {
-        scroll-behavior: smooth;
-        scroll-padding-top: 80px; /* Offset for fixed header */
-      }
-
-      /* Base Styles */
-      body {
-        @apply bg-neo-white dark:bg-neo-dark-bg text-neo-black dark:text-neo-dark-text transition-colors duration-300;
-      }
-
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar {
-        width: 14px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #fff;
-        border-left: 3px solid #000;
-      }
-      html.dark ::-webkit-scrollbar-track {
-        background: #111827; /* neo-dark-bg */
-        border-left: 3px solid #FAFAFA; /* neo-dark-border */
-      }
-
-      ::-webkit-scrollbar-thumb {
-        background: #000;
-        border: 3px solid #000;
-        border-right: none;
-      }
-      html.dark ::-webkit-scrollbar-thumb {
-        background: #FAFAFA; /* neo-dark-border */
-        border: 3px solid #FAFAFA; /* neo-dark-border */
-        border-right: none;
-      }
-
-      ::-webkit-scrollbar-thumb:hover {
-        background: #FFDE59;
-      }
-      html.dark ::-webkit-scrollbar-thumb:hover {
-        background: #7ED957;
-      }
-
-      /* Visually Hidden, Screen-Reader Only */
-      .sr-only {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border-width: 0;
-      }
-
-      /* Dot Pattern Background */
-      .bg-grid-pattern {
-        background-image: radial-gradient(#000 2px, transparent 2px);
-        background-size: 30px 30px;
-      }
-      html.dark .bg-grid-pattern {
-        background-image: radial-gradient(#FAFAFA 2px, transparent 2px);
-      }
-      
-      /* Performant Gradient Blob Background */
-      .bg-gradient-blobs::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 0;
-        background: radial-gradient(circle at 10% 20%, rgba(140, 82, 255, 0.15) 0%, transparent 40%),
-                    radial-gradient(circle at 80% 30%, rgba(92, 225, 230, 0.15) 0%, transparent 40%),
-                    radial-gradient(circle at 20% 80%, rgba(255, 102, 196, 0.15) 0%, transparent 40%);
-        mix-blend-mode: multiply;
-        opacity: 0.7;
-        transition: opacity 0.5s, background 0.5s;
-      }
-
-      html.dark .bg-gradient-blobs::before {
-        mix-blend-mode: screen;
-        opacity: 0.3;
-        background: radial-gradient(circle at 10% 20%, rgba(140, 82, 255, 0.4) 0%, transparent 40%),
-                    radial-gradient(circle at 80% 30%, rgba(92, 225, 230, 0.4) 0%, transparent 40%),
-                    radial-gradient(circle at 20% 80%, rgba(255, 102, 196, 0.4) 0%, transparent 40%);
-      }
-
-
-      /* Animation Classes */
-      .reveal-on-scroll {
-        opacity: 0;
-        transform: translateY(50px);
-        transition: all 1s cubic-bezier(0.2, 0.8, 0.2, 1);
-        will-change: opacity, transform;
-      }
-      
-      .reveal-on-scroll.is-visible {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      .delay-100 { transition-delay: 100ms; }
-      .delay-200 { transition-delay: 200ms; }
-      .delay-300 { transition-delay: 300ms; }
-
-      /* CUSTOM CURSOR LOGIC */
-      @media (hover: hover) and (pointer: fine) {
-        body, a, button, input, textarea, select, [role="button"] {
-          cursor: none !important;
-        }
-      }
-
-      /* Accessibility Focus Ring */
-      *:focus-visible {
-        outline: 3px solid #FF914D !important; /* neo-orange */
-        outline-offset: 2px;
-      }
-    </style>
   <script type="importmap">
 {
   "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0"
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+    "framer-motion": "https://esm.sh/framer-motion@^12.23.26",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "vite": "https://esm.sh/vite@^7.3.0"
   }
 }
 </script>
@@ -227,6 +27,6 @@
 </head>
   <body class="bg-neo-white text-neo-black antialiased selection:bg-neo-pink selection:text-white overflow-x-hidden transition-colors duration-300">
     <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
-</body>
+    <script type="module" src="/index.tsx"></script>
+  </body>
 </html>

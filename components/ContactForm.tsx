@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import NeoButton from './NeoButton';
+import StatefulButton, { ButtonStatus } from './StatefulButton';
 import { Send, CheckCircle } from 'lucide-react';
 
 interface ContactFormProps {
@@ -9,7 +11,7 @@ interface ContactFormProps {
 
 const ContactForm: React.FC<ContactFormProps> = ({ onSuccess, onError }) => {
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState<ButtonStatus>('idle');
   const [isSent, setIsSent] = useState(false);
   const [emailHasError, setEmailHasError] = useState(false);
 
@@ -31,16 +33,20 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSuccess, onError }) => {
     
     if (!contactForm.name.trim() || !contactForm.email.trim() || !contactForm.message.trim()) {
       onError("Please fill in all fields.");
+      setStatus('error');
+      setTimeout(() => setStatus('idle'), 2000);
       return;
     }
 
     if (!validateEmail(contactForm.email)) {
       setEmailHasError(true);
       onError('Please enter a valid email address.');
+      setStatus('error');
+      setTimeout(() => setStatus('idle'), 2000);
       return;
     }
 
-    setIsSubmitting(true);
+    setStatus('loading');
     
     try {
       const response = await fetch("https://formspree.io/f/xqagjnpj", {
@@ -53,15 +59,25 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSuccess, onError }) => {
       });
 
       if (response.ok) {
-        setIsSent(true);
-        // Wait a few seconds to show the confetti/success message before closing
+        setStatus('success');
+        
+        // Wait a moment so the user sees the "Success" state on the button
         setTimeout(() => {
-            onSuccess(contactForm.name);
-            setContactForm({ name: '', email: '', message: '' });
-            setIsSent(false); // Reset for next time
-        }, 3500);
+            setIsSent(true);
+            // Wait a few seconds to show the confetti/success message before closing
+            setTimeout(() => {
+                onSuccess(contactForm.name);
+                setContactForm({ name: '', email: '', message: '' });
+                setIsSent(false); // Reset for next time
+                setStatus('idle');
+            }, 3500);
+        }, 1000);
+        
       } else {
         const data = await response.json();
+        setStatus('error');
+        setTimeout(() => setStatus('idle'), 3000);
+        
         if (data.errors && data.errors.length > 0) {
            onError(data.errors.map((err: any) => err.message).join(", "));
         } else {
@@ -69,9 +85,9 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSuccess, onError }) => {
         }
       }
     } catch (error) {
+       setStatus('error');
+       setTimeout(() => setStatus('idle'), 3000);
        onError("Network error. Please try again later.");
-    } finally {
-       setIsSubmitting(false);
     }
   };
 
@@ -124,7 +140,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSuccess, onError }) => {
     <form onSubmit={handleContactSubmit} noValidate className="flex flex-col gap-8 h-full">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2 group">
-          <label htmlFor="name-input" className="font-mono font-bold text-sm uppercase text-gray-500 dark:text-neo-dark-text-muted group-focus-within:text-neo-purple transition-colors">
+          <label htmlFor="name-input" className="font-mono font-bold text-sm uppercase text-gray-500 dark:text-neo-dark-text-muted group-focus-within:text-neo-purple dark:group-focus-within:text-neo-yellow transition-colors">
             01. Name
           </label>
           <input 
@@ -134,13 +150,13 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSuccess, onError }) => {
             value={contactForm.name}
             onChange={handleContactChange} 
             onKeyDown={handleKeyDown}
-            className="w-full bg-gray-100 dark:bg-neo-dark-bg/50 border-4 border-transparent focus:border-black dark:focus:border-neo-dark-border p-4 font-bold text-xl focus:outline-none transition-colors text-black dark:text-neo-dark-text placeholder-gray-400 dark:placeholder-zinc-600"
+            className="w-full bg-gray-100 dark:bg-zinc-900 border-4 border-transparent focus:bg-white dark:focus:bg-black focus:border-neo-purple dark:focus:border-neo-yellow p-4 font-bold text-xl focus:outline-none transition-all duration-200 text-black dark:text-neo-dark-text placeholder-gray-400 dark:placeholder-zinc-600"
             placeholder="Jane Doe"
           />
         </div>
 
         <div className="space-y-2 group">
-          <label htmlFor="email-input" className="font-mono font-bold text-sm uppercase text-gray-500 dark:text-neo-dark-text-muted group-focus-within:text-neo-purple transition-colors">
+          <label htmlFor="email-input" className="font-mono font-bold text-sm uppercase text-gray-500 dark:text-neo-dark-text-muted group-focus-within:text-neo-purple dark:group-focus-within:text-neo-yellow transition-colors">
              02. Email
           </label>
           <input 
@@ -150,7 +166,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSuccess, onError }) => {
             value={contactForm.email}
             onChange={handleContactChange} 
             onKeyDown={handleKeyDown}
-            className={`w-full bg-gray-100 dark:bg-neo-dark-bg/50 border-4 ${emailHasError ? 'border-neo-pink' : 'border-transparent'} focus:border-black dark:focus:border-neo-dark-border p-4 font-bold text-xl focus:outline-none transition-colors text-black dark:text-neo-dark-text placeholder-gray-400 dark:placeholder-zinc-600`}
+            className={`w-full bg-gray-100 dark:bg-zinc-900 border-4 ${emailHasError ? 'border-neo-pink' : 'border-transparent'} focus:bg-white dark:focus:bg-black focus:border-neo-purple dark:focus:border-neo-yellow p-4 font-bold text-xl focus:outline-none transition-all duration-200 text-black dark:text-neo-dark-text placeholder-gray-400 dark:placeholder-zinc-600`}
             placeholder="jane@example.com"
             aria-invalid={emailHasError}
           />
@@ -158,7 +174,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSuccess, onError }) => {
       </div>
 
       <div className="space-y-2 group flex-grow">
-        <label htmlFor="message-input" className="font-mono font-bold text-sm uppercase text-gray-500 dark:text-neo-dark-text-muted group-focus-within:text-neo-purple transition-colors flex justify-between">
+        <label htmlFor="message-input" className="font-mono font-bold text-sm uppercase text-gray-500 dark:text-neo-dark-text-muted group-focus-within:text-neo-purple dark:group-focus-within:text-neo-yellow transition-colors flex justify-between">
            <span>03. Message</span>
            <span className="hidden md:inline opacity-50 font-normal normal-case">[Ctrl + Enter to send]</span>
         </label>
@@ -169,26 +185,23 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSuccess, onError }) => {
           value={contactForm.message}
           onChange={handleContactChange}
           onKeyDown={handleKeyDown}
-          className="w-full bg-gray-100 dark:bg-neo-dark-bg/50 border-4 border-transparent focus:border-black dark:focus:border-neo-dark-border p-4 font-mono text-lg focus:outline-none transition-all resize-none h-48 text-black dark:text-neo-dark-text"
+          className="w-full bg-gray-100 dark:bg-zinc-900 border-4 border-transparent focus:bg-white dark:focus:bg-black focus:border-neo-purple dark:focus:border-neo-yellow p-4 font-mono text-lg focus:outline-none transition-all duration-200 resize-none h-48 text-black dark:text-neo-dark-text placeholder-gray-400 dark:placeholder-zinc-600"
           placeholder="Tell me about your project..."
         ></textarea>
       </div>
       
       <div className="flex justify-end pt-4">
-        <NeoButton 
+        <StatefulButton 
           type="submit" 
-          disabled={isSubmitting} 
+          status={status}
           variant="black"
-          className="w-full md:w-auto flex items-center justify-center gap-3 py-4 px-12 text-lg group"
+          loadingText="Sending..."
+          successText="Message Sent!"
+          errorText="Failed"
+          className="w-full md:w-auto py-4 px-12 text-lg group"
         >
-          {isSubmitting ? (
-            <>Sending...</>
-          ) : (
-            <>
-              Send Message <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-            </>
-          )}
-        </NeoButton>
+          Send Message <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+        </StatefulButton>
       </div>
     </form>
   );

@@ -1,4 +1,3 @@
-import { GoogleGenAI } from "@google/genai";
 import { PERSONAL_INFO, PROJECTS, SKILLS, SOCIALS } from "../constants";
 
 // Construct a context string for the AI
@@ -41,7 +40,7 @@ Instructions:
 4. Use Google Search to check his GitHub (Dragonballsuper-1995) for the absolute latest repositories or contributions if asked about recent work.
 `;
 
-export const generateChatResponse = async (userMessage: string): Promise<{ text: string }> => {
+export const generateChatResponse = async (userMessage: string): Promise<{ text: string; sources?: { title: string; uri: string }[] }> => {
   try {
     const response = await fetch('https://gemini-backend-portfolio.vercel.app/api/gemini', {
       method: 'POST',
@@ -49,7 +48,7 @@ export const generateChatResponse = async (userMessage: string): Promise<{ text:
       body: JSON.stringify({ userMessage, context: PORTFOLIO_CONTEXT })
     });
     const data = await response.json();
-    return { text: data.text };
+    return { text: data.text, sources: data.sources };
   } catch (error) {
     console.error('Frontend Gemini Error:', error);
     return { text: 'Oops! My brain wiring got crossed. Try again later.' };

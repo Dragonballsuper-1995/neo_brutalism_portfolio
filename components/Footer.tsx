@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ExternalLink, ArrowRight } from 'lucide-react';
 import { NavSection } from '../types';
@@ -6,6 +7,16 @@ import { PERSONAL_INFO, SOCIALS } from '../constants';
 interface FooterProps {
   scrollToSection: (id: NavSection) => void;
 }
+
+const getSocialHoverClass = (platform: string) => {
+  switch(platform.toLowerCase()) {
+    case 'github': return 'hover:text-[#f0f6fc]';
+    case 'linkedin': return 'hover:text-[#0077b5]';
+    case 'instagram': return 'hover:text-[#E4405F]';
+    case 'twitter': return 'hover:text-[#1DA1F2]';
+    default: return 'hover:text-neo-green';
+  }
+};
 
 const Footer: React.FC<FooterProps> = ({ scrollToSection }) => (
   <footer className="bg-neo-dark-bg text-neo-dark-text border-t-4 border-neo-dark-border relative overflow-hidden">
@@ -57,7 +68,7 @@ const Footer: React.FC<FooterProps> = ({ scrollToSection }) => (
                 href={social.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-neo-pink hover:translate-x-1 transition-transform uppercase flex items-center gap-2 text-neo-dark-text-muted hover:text-neo-dark-text"
+                className={`hover:translate-x-1 transition-transform uppercase flex items-center gap-2 text-neo-dark-text-muted ${getSocialHoverClass(social.platform)}`}
               >
                 {social.platform} <ArrowRight size={12} className="-rotate-45" />
               </a>
@@ -70,10 +81,6 @@ const Footer: React.FC<FooterProps> = ({ scrollToSection }) => (
       <div className="max-w-7xl mx-auto px-6 flex justify-center items-center font-mono text-xs text-neo-dark-text-muted">
         <p>© {new Date().getFullYear()} Sujal Sanjay Chhajed. All rights reserved.</p>
       </div>
-    </div>
-    <div className="absolute top-0 right-0 w-full h-full pointer-events-none opacity-20 overflow-hidden">
-      <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-neo-purple rounded-full blur-[80px]"></div>
-      <div className="absolute -left-20 top-20 w-60 h-60 bg-neo-blue rounded-full blur-[80px]"></div>
     </div>
     <style>{`
       .stroke-text {

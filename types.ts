@@ -1,3 +1,12 @@
+
+export interface CaseStudy {
+  problem: string;
+  solution: string;
+  features: string[];
+  challenges: string[];
+  stackDetails: { name: string; reason: string }[];
+}
+
 export interface Project {
   id: number;
   title: string;
@@ -5,8 +14,9 @@ export interface Project {
   tags: string[];
   link: string;
   github?: string;
-  image: string;
   category: 'Frontend' | 'Backend' | 'Fullstack' | 'Mobile' | 'AI/ML' | 'Data Science' | 'Web Dev';
+  image: string;
+  caseStudy?: CaseStudy;
 }
 
 export interface Skill {

@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 interface NeoButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -13,11 +14,11 @@ const NeoButton: React.FC<NeoButtonProps> = ({
 }) => {
   const getBaseStyles = () => {
     switch(variant) {
-      case 'primary': return 'bg-neo-yellow hover:bg-white text-black dark:hover:bg-white';
-      case 'secondary': return 'bg-neo-orange hover:bg-orange-300 text-black';
-      case 'accent': return 'bg-neo-blue hover:bg-cyan-300 text-black';
+      case 'primary': return 'bg-neo-yellow hover:bg-neo-green text-black'; 
+      case 'secondary': return 'bg-neo-orange hover:bg-neo-yellow text-black';
+      case 'accent': return 'bg-neo-blue text-black hover:bg-neo-purple hover:text-white'; // Changed hover
       case 'black': return 'bg-black text-white hover:bg-gray-900 dark:bg-neo-dark-border dark:text-neo-dark-bg dark:hover:bg-gray-200';
-      case 'outline': return 'bg-white hover:bg-gray-50 text-black dark:bg-transparent dark:text-neo-dark-text dark:hover:bg-neo-dark-border dark:hover:text-neo-dark-bg';
+      case 'outline': return 'bg-white hover:bg-neo-pink text-black dark:bg-transparent dark:text-neo-dark-text dark:hover:bg-neo-pink dark:hover:text-black'; 
       default: return 'bg-neo-yellow text-black';
     }
   };

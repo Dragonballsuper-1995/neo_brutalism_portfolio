@@ -1,43 +1,67 @@
-import React from 'react';
-import { Github, ExternalLink } from 'lucide-react';
+
+import React, { useState } from 'react';
+import { Github, ExternalLink, ArrowRight, BookOpen } from 'lucide-react';
 import { Project } from '../types';
 import Tooltip from './Tooltip';
+import CanvasRevealEffect from './ui/CanvasRevealEffect';
 
 interface ProjectCardProps {
   project: Project;
   index: number;
+  onClick: (project: Project) => void;
+  theme: 'light' | 'dark';
 }
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
-  // Swapped indices to ensure ID 3 (YouTube) maps to Pink when using (id-1) % length
-  // ID 1 (FPL) -> Index 0 -> Yellow
-  // ID 2 (Urban) -> Index 1 -> Orange
-  // ID 3 (YouTube) -> Index 2 -> Pink
-  // ID 4 (Anom) -> Index 3 -> Blue
-  const shadowColors = [
-    '#FFDE59', // Yellow
-    '#FF914D', // Orange
-    '#FF66C4', // Pink
-    '#5CE1E6', // Blue
-    '#7ED957', // Green
-    '#8C52FF'  // Purple
-  ];
+// Helper to convert hex to rgb array
+const hexToRgb = (hex: string): number[] => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result 
+    ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] 
+    : [0, 0, 0];
+}
+
+// NEON colors for Dark Mode (High brightness to pop on Black)
+const DARK_COLORS_HEX = [
+  '#FFDE59', // Neon Yellow
+  '#FF914D', // Neon Orange
+  '#FF66C4', // Neon Pink
+  '#5CE1E6', // Neon Blue
+  '#7ED957', // Neon Green
+  '#8C52FF'  // Neon Purple
+];
+
+// SATURATED colors for Light Mode (Darker shades to pop on White)
+const LIGHT_COLORS_HEX = [
+  '#D9B918', // Darker Yellow
+  '#D96D18', // Darker Orange
+  '#D91888', // Darker Pink
+  '#0099CC', // Darker Blue
+  '#4AAD18', // Darker Green
+  '#5D18D9'  // Darker Purple
+];
+
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, index, onClick, theme }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const isDark = theme === 'dark';
   
-  // Use project.id instead of index to ensure stable colors when filtering
-  const colorIndex = (project.id - 1) % shadowColors.length;
-  const shadowColor = shadowColors[colorIndex];
+  const colorIndex = (project.id - 1) % DARK_COLORS_HEX.length;
+  
+  // Select color based on theme
+  const activeColorHex = isDark ? DARK_COLORS_HEX[colorIndex] : LIGHT_COLORS_HEX[colorIndex];
+  // const shadowColorHex = DARK_COLORS_HEX[colorIndex]; // Keep shadow neon for the border effect (unused variable removed)
+  const rgbColor = hexToRgb(activeColorHex);
   
   const marqueeTags = [...project.tags, ...project.tags, ...project.tags, ...project.tags];
 
   const getWatermarkText = (category: string) => {
     const mapping: { [key: string]: string } = {
-      'Data Science': 'DATA SCI',
-      'Web Dev': 'WEB DEV',
-      'AI/ML': 'AI/ML',
-      'Frontend': 'FRONTEND',
-      'Backend': 'BACKEND',
-      'Fullstack': 'FULLSTACK',
-      'Mobile': 'MOBILE',
+      'Data Science': 'DATA',
+      'Web Dev': 'WEB',
+      'AI/ML': 'AI',
+      'Frontend': 'UI',
+      'Backend': 'API',
+      'Fullstack': 'FULL',
+      'Mobile': 'APP',
     };
     return mapping[category] || category.toUpperCase();
   };
@@ -45,97 +69,103 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
   const watermarkText = getWatermarkText(project.category);
 
   return (
-    <div 
-      className="group relative h-full bg-white dark:bg-neo-dark-surface border-4 border-black dark:border-neo-dark-border p-6 md:p-8 flex flex-col overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_var(--shadow-col)] will-change-transform transform-gpu"
-      style={{ '--shadow-col': shadowColor } as React.CSSProperties}
+    <button 
+      onClick={() => onClick(project)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="w-full text-left group relative h-full flex flex-col overflow-hidden border-4 border-black dark:border-neo-dark-border bg-white dark:bg-neo-dark-surface shadow-neo dark:shadow-neo-dark hover:shadow-neo-lg dark:hover:shadow-neo-lg-dark hover:-translate-y-2 transition-all duration-300"
+      aria-label={`View details for ${project.title}`}
     >
-      {/* Watermark */}
-      <div className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none z-0">
-        <span className="font-sans font-black text-7xl sm:text-8xl md:text-9xl text-black/[.04] dark:text-neo-dark-border/[.04] whitespace-nowrap select-none -rotate-12 transform-gpu">
-          {watermarkText}
-        </span>
-      </div>
-      
-      {/* Pattern Background */}
+      {/* Decorative Top Bar */}
       <div 
-        className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500 bg-[radial-gradient(#000_1px,transparent_1px)] dark:bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none z-0"
+        className="h-2 w-full border-b-4 border-black dark:border-neo-dark-border"
+        style={{ backgroundColor: activeColorHex }}
       />
 
-      {/* Header: Index & Category */}
-      <div className="flex justify-between items-start mb-4 relative z-10">
-        <span className="font-mono text-sm font-bold text-gray-500 dark:text-neo-dark-text-muted uppercase tracking-widest">
-          {String(index + 1).padStart(2, '0')} // {project.category}
-        </span>
+      {/* Main Content Container */}
+      <div className="relative flex-1 flex flex-col p-8 z-10">
+         {/* Background Watermark */}
+         <div 
+           className="absolute -right-4 top-10 text-9xl font-black opacity-5 pointer-events-none select-none z-0 rotate-12 transition-transform duration-500 group-hover:rotate-0 group-hover:scale-110"
+           style={{ color: activeColorHex }}
+         >
+           {watermarkText}
+         </div>
+
+         {/* Header */}
+         <div className="relative z-10 mb-6">
+            <div className="flex justify-between items-start gap-4">
+              <h3 className="text-2xl md:text-3xl font-black uppercase leading-tight group-hover:text-neo-purple dark:group-hover:text-neo-yellow transition-colors">
+                {project.title}
+              </h3>
+              <div 
+                className="p-2 border-2 border-black dark:border-neo-dark-border bg-white dark:bg-black transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_#fff]"
+              >
+                <BookOpen size={20} />
+              </div>
+            </div>
+         </div>
+
+         {/* Description */}
+         <p className="relative z-10 font-mono text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-8 line-clamp-3">
+           {project.description}
+         </p>
+
+         {/* Links & Action */}
+         <div className="relative z-10 mt-auto flex items-center justify-between border-t-2 border-black/10 dark:border-white/10 pt-6">
+            <div className="flex gap-3">
+              {project.github && (
+                <div 
+                  onClick={(e) => { e.stopPropagation(); window.open(project.github, '_blank'); }}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-sm transition-colors cursor-pointer"
+                >
+                  <Tooltip text="View Code">
+                     <Github size={20} />
+                  </Tooltip>
+                </div>
+              )}
+              <div 
+                onClick={(e) => { e.stopPropagation(); window.open(project.link, '_blank'); }}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-sm transition-colors cursor-pointer"
+              >
+                 <Tooltip text="Live Demo">
+                    <ExternalLink size={20} />
+                 </Tooltip>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider group-hover:underline decoration-2 underline-offset-4 decoration-neo-pink">
+               Read Case Study <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+            </div>
+         </div>
       </div>
 
-      {/* Title */}
-      <h3 className="text-3xl md:text-4xl font-black uppercase leading-[0.9] mb-4 text-black dark:text-neo-dark-text group-hover:text-[var(--shadow-col)] transition-colors duration-300 relative z-10 break-words">
-        {project.title}
-      </h3>
-
-      {/* Description */}
-      <p className="font-mono text-sm text-gray-700 dark:text-neo-dark-text-muted mb-6 leading-relaxed relative z-10 flex-grow">
-        {project.description}
-      </p>
-
-      {/* Tags (Animated Marquee) */}
-      <div className="mb-8 relative z-10 w-full overflow-hidden">
-        <div className="flex w-max transform-gpu">
-           {/* First Strip */}
-           <div className="flex shrink-0 animate-marquee gap-2 pr-2 group-hover:[animation-play-state:paused] will-change-transform">
-             {marqueeTags.map((tag, i) => (
-               <span key={`t1-${i}`} className="border-2 border-black dark:border-neo-dark-border px-2 py-1 text-[10px] md:text-xs font-bold uppercase bg-transparent text-black dark:text-neo-dark-text hover:bg-neo-yellow hover:text-black transition-colors cursor-default whitespace-nowrap">
-                   {tag}
-               </span>
-             ))}
-           </div>
-           {/* Duplicate Strip for seamless loop */}
-           <div className="flex shrink-0 animate-marquee gap-2 pr-2 group-hover:[animation-play-state:paused] will-change-transform" aria-hidden="true">
-             {marqueeTags.map((tag, i) => (
-               <span key={`t2-${i}`} className="border-2 border-black dark:border-neo-dark-border px-2 py-1 text-[10px] md:text-xs font-bold uppercase bg-transparent text-black dark:text-neo-dark-text hover:bg-neo-yellow hover:text-black transition-colors cursor-default whitespace-nowrap">
-                   {tag}
-               </span>
-             ))}
-           </div>
+      {/* Marquee Tags Footer */}
+      <div 
+         className="relative z-10 border-t-4 border-black dark:border-neo-dark-border py-3 overflow-hidden"
+         style={{ backgroundColor: activeColorHex }}
+      >
+        <div className="flex animate-marquee whitespace-nowrap">
+          {marqueeTags.map((tag, i) => (
+             <span key={i} className="mx-4 font-black text-xs uppercase text-black tracking-widest flex items-center gap-2">
+               {tag} <span className="w-1 h-1 bg-black rounded-full"></span>
+             </span>
+          ))}
         </div>
       </div>
 
-      {/* Footer Buttons Side-by-Side */}
-      <div className="mt-auto grid grid-cols-2 gap-3 relative z-10">
-        {/* Live Demo Button */}
-        <Tooltip text="Open Live Demo" className="w-full">
-          <a 
-            href={project.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 border-4 border-black dark:border-neo-dark-border py-3 px-2 font-black uppercase text-xs md:text-sm bg-white dark:bg-neo-dark-bg text-black dark:text-neo-dark-text hover:bg-neo-green hover:text-black transition-colors group/btn w-full"
-          >
-            <span>Live Demo</span>
-            <ExternalLink size={16} className="group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5 transition-transform" />
-          </a>
-        </Tooltip>
-
-        {/* Source Code Button */}
-        {project.github ? (
-           <Tooltip text="View Source Code" className="w-full">
-             <a 
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 border-4 border-black dark:border-neo-dark-border py-3 px-2 font-black uppercase text-xs md:text-sm bg-white dark:bg-neo-dark-bg text-black dark:text-neo-dark-text hover:bg-neo-blue hover:text-black transition-colors group/btn2 w-full"
-            >
-              <span>Source</span>
-              <Github size={16} className="group-hover/btn2:-translate-y-0.5 group-hover/btn2:translate-x-0.5 transition-transform" />
-            </a>
-           </Tooltip>
-        ) : (
-          <div className="flex items-center justify-center border-4 border-gray-300 dark:border-gray-700 text-gray-400 py-3 px-2 font-black uppercase text-xs md:text-sm cursor-not-allowed w-full">
-            <span>Private</span>
-          </div>
-        )}
+      {/* Hover Reveal Effect (Canvas) - Optimization: Only animate when hovered */}
+      <div className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none mix-blend-multiply dark:mix-blend-screen">
+          <CanvasRevealEffect 
+             animationSpeed={4} 
+             containerClassName="bg-transparent"
+             colors={[rgbColor]}
+             opacities={[0.1, 0.1, 0.2, 0.2, 0.2, 0.4, 0.4, 0.4, 0.8, 1]}
+             dotSize={2}
+             enabled={isHovered}
+          />
       </div>
-
-    </div>
+    </button>
   );
 };
 

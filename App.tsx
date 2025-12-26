@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
-import { X, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 
 import CustomCursor from './components/CustomCursor';
 import BackgroundGrid from './components/BackgroundGrid';
@@ -8,6 +9,7 @@ import ScrollToTopButton from './components/ScrollToTopButton';
 import LoadingScreen from './components/LoadingScreen';
 import ContactForm from './components/ContactForm';
 import ToastNotification from './components/ToastNotification';
+import CommandPalette from './components/CommandPalette';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -15,9 +17,12 @@ import Skills from './components/Skills';
 import ProjectsSection from './components/ProjectsSection';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
+import ProjectCaseStudy from './components/ProjectCaseStudy';
+import MobileNavBar from './components/MobileNavBar';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from './components/ui/Sheet';
 
-import { PERSONAL_INFO, PROJECTS } from './constants';
-import { NavSection } from './types';
+import { PERSONAL_INFO } from './constants';
+import { NavSection, Project } from './types';
 
 // Global scroll reveal hook
 const useGlobalScrollReveal = (isLoaded: boolean) => {
@@ -51,24 +56,40 @@ const App: React.FC = () => {
   const [isLoaderMounted, setIsLoaderMounted] = useState(true);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [isCmdPaletteOpen, setIsCmdPaletteOpen] = useState(false);
+  
+  // Sheet state for Project Case Study
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  
+  // Theme State with Persistence (Updated: Defaulting to Light Mode)
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    // Check localStorage first
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+    }
+    // Hard default to light mode
+    return 'light';
+  });
+
   const [activeSection, setActiveSection] = useState<NavSection>(NavSection.HERO);
   const [toast, setToast] = useState({ message: '', visible: false, type: 'success' as 'success' | 'error' });
 
   const handleLoadingComplete = useCallback(() => {
     setIsLoading(false);
+    // Reduced timeout to match the faster 700ms animation in LoadingScreen
     setTimeout(() => {
       setIsLoaderMounted(false);
-    }, 500);
+    }, 850);
   }, []);
 
   // Preload images optimized: Defer to idle time to prioritize FCP
   useEffect(() => {
     const preloadImages = () => {
       const imageUrls = [
-        'logo-light.svg',
-        'logo-dark.svg',
-        ...PROJECTS.map(p => p.image)
+        '/logo-light.svg',
+        '/logo-dark.svg',
+        '/profile-pic-4.webp'
       ];
       imageUrls.forEach(url => { (new Image()).src = url; });
     };
@@ -85,28 +106,57 @@ const App: React.FC = () => {
 
   // Active Section Spy
   useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: '-50% 0px -50% 0px',
-      threshold: 0
+    let ticking = false;
+    const sections = Object.values(NavSection);
+
+    const updateActiveSection = () => {
+       const scrollY = window.scrollY;
+       const viewportHeight = window.innerHeight;
+       const triggerPoint = scrollY + (viewportHeight * 0.35);
+       
+       const docHeight = document.documentElement.scrollHeight;
+       if (scrollY + viewportHeight >= docHeight - 50) {
+         setActiveSection(NavSection.CONTACT);
+         return;
+       }
+
+       let active = NavSection.HERO;
+
+       for (const sectionId of sections) {
+         const el = document.getElementById(sectionId);
+         if (el) {
+           const top = el.offsetTop;
+           const height = el.offsetHeight;
+           
+           if (triggerPoint >= top && triggerPoint < top + height) {
+             active = sectionId as NavSection;
+             break;
+           }
+         }
+       }
+       
+       setActiveSection(active);
     };
-    const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setActiveSection(entry.target.id as NavSection);
-        }
-      });
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          updateActiveSection();
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    const observer = new IntersectionObserver(observerCallback, observerOptions);
-    Object.values(NavSection).forEach((sectionId) => {
-      const element = document.getElementById(sectionId);
-      if (element) observer.observe(element);
-    });
-    return () => observer.disconnect();
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    updateActiveSection();
+
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Theme Toggle Logic
+  // Theme Toggle Logic & Persistence
   useEffect(() => {
+    localStorage.setItem('theme', theme);
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
@@ -151,31 +201,31 @@ const App: React.FC = () => {
     showToast(errorMessage, 'error');
   }, [showToast]);
 
+  // Handle opening project details
+  const handleProjectClick = useCallback((project: Project) => {
+    setSelectedProject(project);
+  }, []);
+
   // Body scroll lock for modal and loader
   useEffect(() => {
-    const shouldLock = isContactOpen || isChatOpen || isLoaderMounted;
-    document.body.style.overflow = shouldLock ? 'hidden' : '';
-    
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (isContactOpen) setIsContactOpen(false);
-      }
-    };
-    
-    if (isContactOpen) {
-      window.addEventListener('keydown', handleKeyDown);
+    const shouldLock = isChatOpen || isLoaderMounted || isCmdPaletteOpen;
+    // Sheets handle their own scroll locking, so we check for others here
+    if (shouldLock) {
+      document.body.style.overflow = 'hidden';
+    } else if (!isContactOpen && !selectedProject) {
+      document.body.style.overflow = '';
     }
+    
     return () => {
-        document.body.style.overflow = '';
-        window.removeEventListener('keydown', handleKeyDown);
+       // Cleanup logic handled mostly by components
     };
-  }, [isContactOpen, isChatOpen, isLoaderMounted]);
+  }, [isChatOpen, isLoaderMounted, isCmdPaletteOpen, isContactOpen, selectedProject]);
 
   return (
     <>
       {isLoaderMounted && <LoadingScreen onComplete={handleLoadingComplete} name={PERSONAL_INFO.name} />}
 
-      {/* Backdrop for modals */}
+      {/* Backdrop for Chat Modal */}
       {isChatOpen && (
         <div
           className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-[fadeIn_0.3s_ease-out]"
@@ -184,8 +234,9 @@ const App: React.FC = () => {
         />
       )}
 
-      <main className={`min-h-screen flex flex-col font-sans bg-neo-white dark:bg-neo-dark-bg text-neo-black dark:text-neo-dark-text relative transition-opacity duration-500 bg-gradient-blobs ${!isLoading ? 'opacity-100' : 'opacity-0'}`}>
-        <CustomCursor />
+      {/* Faster transition for main content to ensure it's ready behind the loader */}
+      <main className={`min-h-screen flex flex-col font-sans bg-neo-white dark:bg-neo-dark-bg text-neo-black dark:text-neo-dark-text relative transition-opacity duration-100 pb-24 md:pb-0 ${!isLoading ? 'opacity-100' : 'opacity-0'}`}>
+        <CustomCursor highContrast={isChatOpen && theme === 'light'} />
         <BackgroundGrid theme={theme} />
 
         <Header
@@ -193,56 +244,66 @@ const App: React.FC = () => {
           toggleTheme={toggleTheme}
           activeSection={activeSection}
           scrollToSection={scrollToSection}
+          openCommandPalette={() => setIsCmdPaletteOpen(true)}
         />
 
         <Hero scrollToSection={scrollToSection} />
         <About />
         <Skills />
-        <ProjectsSection />
+        
+        {/* Pass click handler and theme to ProjectsSection */}
+        <ProjectsSection onProjectClick={handleProjectClick} theme={theme} />
+        
         <ContactSection
           setIsContactOpen={setIsContactOpen}
           copyToClipboard={copyToClipboard}
         />
         <Footer scrollToSection={scrollToSection} />
 
-        {isContactOpen && (
-          <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
-            <div
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]"
-              onClick={() => setIsContactOpen(false)}
-            ></div>
-
-            <div className="relative w-full max-w-2xl bg-white dark:bg-neo-dark-surface border-4 border-black dark:border-neo-dark-border shadow-neo-xl dark:shadow-neo-lg-dark animate-[scaleIn_0.2s_ease-out] flex flex-col max-h-[90vh]">
-              <div className="flex justify-between items-center p-4 border-b-4 border-black dark:border-neo-dark-border bg-neo-yellow text-black flex-shrink-0">
-                <h2 className="font-black text-xl uppercase tracking-wider flex items-center gap-2">
-                  <Send size={20} /> New Message
-                </h2>
-                <button
-                  onClick={() => setIsContactOpen(false)}
-                  className="p-1 hover:bg-black hover:text-white transition-colors border-2 border-transparent hover:border-transparent"
-                >
-                  <X size={24} />
-                </button>
-              </div>
-              <div className="p-6 md:p-8 overflow-y-auto">
-                <ContactForm
-                  onSuccess={handleFormSuccess}
-                  onError={handleFormError}
-                />
-              </div>
+        {/* Contact Sheet */}
+        <Sheet open={isContactOpen} onOpenChange={setIsContactOpen}>
+          <SheetContent className="w-full sm:max-w-xl p-0 border-l-4 border-black dark:border-neo-dark-border">
+            <SheetHeader className="p-4 border-b-4 border-black dark:border-neo-dark-border bg-neo-yellow text-black">
+              <SheetTitle className="flex items-center gap-2">
+                <Send size={20} /> New Message
+              </SheetTitle>
+            </SheetHeader>
+            <div className="p-6 md:p-8 h-full overflow-y-auto pb-20">
+              <ContactForm
+                onSuccess={handleFormSuccess}
+                onError={handleFormError}
+              />
             </div>
+          </SheetContent>
+        </Sheet>
 
-            <style>{`
-              @keyframes scaleIn {
-                0% { opacity: 0; transform: scale(0.95); }
-                100% { opacity: 1; transform: scale(1); }
-              }
-            `}</style>
-          </div>
-        )}
+        {/* Project Case Study Sheet (Feature #5 Implementation) */}
+        <Sheet open={!!selectedProject} onOpenChange={(open) => !open && setSelectedProject(null)}>
+          <SheetContent className="w-full sm:max-w-3xl p-0 border-l-4 border-black dark:border-neo-dark-border">
+             {selectedProject && <ProjectCaseStudy project={selectedProject} />}
+          </SheetContent>
+        </Sheet>
+
+        <CommandPalette 
+          theme={theme}
+          toggleTheme={toggleTheme}
+          scrollToSection={scrollToSection}
+          setIsContactOpen={setIsContactOpen}
+          setIsChatOpen={setIsChatOpen}
+          isOpen={isCmdPaletteOpen}
+          setIsOpen={setIsCmdPaletteOpen}
+        />
 
         <ScrollToTopButton />
         <ChatAssistant isOpen={isChatOpen} setIsOpen={setIsChatOpen} />
+        
+        {/* New Mobile Bottom Navigation */}
+        <MobileNavBar 
+          activeSection={activeSection}
+          scrollToSection={scrollToSection}
+          openCommandPalette={() => setIsCmdPaletteOpen(true)}
+        />
+        
         <ToastNotification
           message={toast.message}
           isVisible={toast.visible}
