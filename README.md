@@ -1,4 +1,4 @@
-﻿# ⚡ SUJAL.DEV | Neo-Brutalist AI Portfolio
+# ⚡ SUJAL.DEV | Neo-Brutalist AI Portfolio
 
 ![Neo-Brutalism Banner](public/banner.webp)
 
@@ -13,7 +13,7 @@
 <a href="https://sujal-chhajed.vercel.app/" aria-label="Live Demo" style="text-decoration:none;">
 <img src="https://img.shields.io/badge/LIVE_DEMO-%23050505?style=for-the-badge&labelColor=FFDE59&logo=rocket&logoColor=050505" alt="Live Demo" style="box-shadow:7px 7px 0 #050505;border:3px solid #050505;" />
 </a>
-<a href="LICENSE" aria-label="MIT License" style="text-decoration:none;">
+<a href="LICENSE.txt" aria-label="MIT License" style="text-decoration:none;">
 <img src="https://img.shields.io/badge/License-MIT-%23050505?style=for-the-badge&labelColor=9AE6B4&logo=opensourceinitiative&logoColor=050505" alt="MIT License" style="box-shadow:7px 7px 0 #050505;border:3px solid #050505;" />
 </a>
 </div>
