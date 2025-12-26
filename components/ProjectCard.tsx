@@ -1,4 +1,4 @@
-
+﻿
 import React, { useState } from 'react';
 import { Github, ExternalLink, ArrowRight, BookOpen } from 'lucide-react';
 import { Project } from '../types';
@@ -7,7 +7,6 @@ import CanvasRevealEffect from './ui/CanvasRevealEffect';
 
 interface ProjectCardProps {
   project: Project;
-  index: number;
   onClick: (project: Project) => void;
   theme: 'light' | 'dark';
 }
@@ -40,7 +39,7 @@ const LIGHT_COLORS_HEX = [
   '#5D18D9'  // Darker Purple
 ];
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ project, index, onClick, theme }) => {
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, theme }) => {
   const [isHovered, setIsHovered] = useState(false);
   const isDark = theme === 'dark';
   

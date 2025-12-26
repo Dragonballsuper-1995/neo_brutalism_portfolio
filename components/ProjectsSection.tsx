@@ -1,4 +1,4 @@
-
+﻿
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Section from './Section';
@@ -149,7 +149,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ onProjectClick, theme
             filteredProjects.map((project, index) => (
               <div key={project.id} className="min-w-[85vw] md:min-w-0 snap-center h-full">
                  <ScrollAnimation variant="fadeUp" delay={index * 0.1} className="h-full">
-                    <ProjectCard project={project} index={index} onClick={onProjectClick} theme={theme} />
+                    <ProjectCard project={project} onClick={onProjectClick} theme={theme} />
                  </ScrollAnimation>
               </div>
             ))
