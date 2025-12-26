@@ -1,4 +1,4 @@
-﻿
+
 import React, { useState } from 'react';
 import { Github, ExternalLink, ArrowRight, BookOpen } from 'lucide-react';
 import { Project } from '../types';

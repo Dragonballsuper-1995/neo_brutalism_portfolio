@@ -28,7 +28,7 @@ const Hero: React.FC<HeroProps> = ({ scrollToSection }) => {
   return (
     <Section
       id={NavSection.HERO}
-      className="min-h-screen flex flex-col justify-center items-center text-center relative overflow-hidden"
+      className="min-h-svh flex flex-col justify-center items-center text-center relative overflow-hidden"
     >
       <div className="relative z-10 max-w-5xl mx-auto px-4 pt-10 md:pt-20 flex flex-col items-center">
         

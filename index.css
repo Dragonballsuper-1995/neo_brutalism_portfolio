@@ -6,6 +6,8 @@
 /* Global Styles & Optimization */
 html {
   scroll-padding-top: 80px; /* Offset for fixed header */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 /* Only smooth scroll if user hasn't requested reduced motion */

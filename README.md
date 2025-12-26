@@ -1,4 +1,4 @@
-# ⚡ SUJAL.DEV | Neo-Brutalist AI Portfolio
+﻿# ⚡ SUJAL.DEV | Neo-Brutalist AI Portfolio
 
 ![Neo-Brutalism Banner](public/banner.webp)
 

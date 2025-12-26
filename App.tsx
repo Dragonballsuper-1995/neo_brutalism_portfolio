@@ -235,7 +235,7 @@ const App: React.FC = () => {
       )}
 
       {/* Faster transition for main content to ensure it's ready behind the loader */}
-      <main className={`min-h-screen flex flex-col font-sans bg-neo-white dark:bg-neo-dark-bg text-neo-black dark:text-neo-dark-text relative transition-opacity duration-100 pb-24 md:pb-0 ${!isLoading ? 'opacity-100' : 'opacity-0'}`}>
+      <main className={`min-h-svh flex flex-col font-sans bg-neo-white dark:bg-neo-dark-bg text-neo-black dark:text-neo-dark-text relative transition-opacity duration-100 pb-24 md:pb-0 ${!isLoading ? 'opacity-100' : 'opacity-0'}`}>
         <CustomCursor highContrast={isChatOpen && theme === 'light'} />
         <BackgroundGrid theme={theme} />
 

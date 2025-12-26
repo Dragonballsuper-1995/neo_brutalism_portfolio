@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface CustomCursorProps {
   /**
@@ -30,7 +30,6 @@ const CustomCursor: React.FC<CustomCursorProps> = ({ highContrast = false }) => 
     apply();
 
     const onChange = () => apply();
-
     mql.addEventListener('change', onChange);
     return () => mql.removeEventListener('change', onChange);
   }, []);
