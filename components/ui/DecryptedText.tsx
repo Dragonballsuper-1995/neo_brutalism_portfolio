@@ -1,4 +1,4 @@
-
+﻿
 import React, { useEffect, useState, useRef } from "react";
 
 interface DecryptedTextProps {
@@ -6,7 +6,6 @@ interface DecryptedTextProps {
   className?: string;
   characters?: string;
   speed?: number;
-  revealDirection?: "start" | "end" | "center";
   useOriginalCharsOnly?: boolean;
 }
 
@@ -17,7 +16,6 @@ export const DecryptedText: React.FC<DecryptedTextProps> = ({
   className = "",
   characters = DEFAULT_CHARS,
   speed = 15,
-  revealDirection = "start", // 'start' means left-to-right
   useOriginalCharsOnly = false,
 }) => {
   const [displayText, setDisplayText] = useState(text);
@@ -59,7 +57,7 @@ export const DecryptedText: React.FC<DecryptedTextProps> = ({
     let iteration = 0;
 
     const interval = setInterval(() => {
-      setDisplayText((prev) => {
+      setDisplayText(() => {
         return text
           .split("")
           .map((char, index) => {

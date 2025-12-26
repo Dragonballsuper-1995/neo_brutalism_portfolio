@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 
 interface CustomCursorProps {
   /**
@@ -30,15 +30,9 @@ const CustomCursor: React.FC<CustomCursorProps> = ({ highContrast = false }) => 
     apply();
 
     const onChange = () => apply();
-    // Safari support
-    if ('addEventListener' in mql) {
-      mql.addEventListener('change', onChange);
-      return () => mql.removeEventListener('change', onChange);
-    }
-    // eslint-disable-next-line deprecation/deprecation
-    mql.addListener(onChange);
-    // eslint-disable-next-line deprecation/deprecation
-    return () => mql.removeListener(onChange);
+
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
   }, []);
 
   useEffect(() => {

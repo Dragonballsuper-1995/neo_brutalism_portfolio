@@ -1,4 +1,4 @@
-
+﻿
 import React, { useEffect, useRef } from 'react';
 
 interface BackgroundGridProps {
@@ -148,24 +148,14 @@ const BackgroundGrid: React.FC<BackgroundGridProps> = ({ theme }) => {
       bindPointerListeners();
     };
 
-    if ('addEventListener' in coarseMql) {
-      coarseMql.addEventListener('change', handlePointerModeChange);
-    } else {
-      // eslint-disable-next-line deprecation/deprecation
-      coarseMql.addListener(handlePointerModeChange);
-    }
+    coarseMql.addEventListener('change', handlePointerModeChange);
 
     return () => {
       window.removeEventListener('resize', handleResize);
       if (handleMouseMove) window.removeEventListener('mousemove', handleMouseMove);
       if (handleMouseLeave) document.removeEventListener('mouseleave', handleMouseLeave);
 
-      if ('removeEventListener' in coarseMql) {
-        coarseMql.removeEventListener('change', handlePointerModeChange);
-      } else {
-        // eslint-disable-next-line deprecation/deprecation
-        coarseMql.removeListener(handlePointerModeChange);
-      }
+      coarseMql.removeEventListener('change', handlePointerModeChange);
 
       if (rafId != null) cancelAnimationFrame(rafId);
     };
