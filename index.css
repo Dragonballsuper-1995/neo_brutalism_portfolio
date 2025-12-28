@@ -1,0 +1,130 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global Styles & Optimization */
+html {
+  scroll-padding-top: 80px; /* Offset for fixed header */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Prevent mobile zoom issues */
+html, body {
+  touch-action: manipulation;
+}
+
+/* Only smooth scroll if user hasn't requested reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Base Styles */
+body {
+  @apply bg-neo-white dark:bg-neo-dark-bg text-neo-black dark:text-neo-dark-text transition-colors duration-300;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 14px;
+}
+::-webkit-scrollbar-track {
+  background: #fff;
+  border-left: 3px solid #000;
+}
+html.dark ::-webkit-scrollbar-track {
+  background: #000000;
+  border-left: 3px solid #FFFFFF;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #000;
+  border: 3px solid #000;
+  border-right: none;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: #FFFFFF;
+  border: 3px solid #FFFFFF;
+  border-right: none;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FFDE59;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #7ED957;
+}
+
+/* Dot Pattern Background */
+.bg-grid-pattern {
+  background-image: radial-gradient(#000 2px, transparent 2px);
+  background-size: 30px 30px;
+}
+html.dark .bg-grid-pattern {
+  background-image: radial-gradient(#FFFFFF 2px, transparent 2px);
+}
+
+/* Animation Classes */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.delay-100 { transition-delay: 100ms; }
+.delay-200 { transition-delay: 200ms; }
+.delay-300 { transition-delay: 300ms; }
+
+/* Helper for GPU acceleration */
+.will-change-transform {
+  will-change: transform;
+}
+
+/* CUSTOM CURSOR LOGIC */
+@media (hover: hover) and (pointer: fine) {
+  body.has-custom-cursor,
+  body.has-custom-cursor a,
+  body.has-custom-cursor button,
+  body.has-custom-cursor input,
+  body.has-custom-cursor textarea,
+  body.has-custom-cursor select,
+  body.has-custom-cursor [role="button"] {
+    cursor: none !important;
+  }
+}
+
+/* Accessibility Focus Ring */
+*:focus-visible {
+  outline: 3px solid #FF914D !important;
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  header, footer, .no-print, [role="dialog"], button, canvas, .cursor-follower, .custom-cursor { 
+    display: none !important; 
+  }
+  body, main { 
+    background: white !important; 
+    color: black !important; 
+  }
+  section { 
+    border: none !important; 
+    page-break-inside: avoid; 
+    min-height: auto !important;
+  }
+}
