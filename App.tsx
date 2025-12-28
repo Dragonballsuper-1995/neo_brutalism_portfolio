@@ -115,7 +115,15 @@ const App: React.FC = () => {
        const triggerPoint = scrollY + (viewportHeight * 0.35);
        
        const docHeight = document.documentElement.scrollHeight;
-       if (scrollY + viewportHeight >= docHeight - 50) {
+       // If near bottom of page, always show CONTACT
+       if (scrollY + viewportHeight >= docHeight - 100) {
+         setActiveSection(NavSection.CONTACT);
+         return;
+       }
+       
+       // Check if we're past the contact section start - if so, stay on CONTACT
+       const contactEl = document.getElementById(NavSection.CONTACT);
+       if (contactEl && triggerPoint >= contactEl.offsetTop) {
          setActiveSection(NavSection.CONTACT);
          return;
        }
@@ -241,7 +249,7 @@ const App: React.FC = () => {
       )}
 
       {/* Faster transition for main content to ensure it's ready behind the loader */}
-      <main className={`min-h-svh flex flex-col font-sans bg-neo-white dark:bg-neo-dark-bg text-neo-black dark:text-neo-dark-text relative transition-opacity duration-100 pb-24 md:pb-0 ${!isLoading ? 'opacity-100' : 'opacity-0'}`}>
+      <main className={`min-h-svh flex flex-col font-sans bg-neo-white dark:bg-neo-dark-bg text-neo-black dark:text-neo-dark-text relative transition-opacity duration-100 ${!isLoading ? 'opacity-100' : 'opacity-0'}`}>
         <CustomCursor highContrast={isChatOpen && theme === 'light'} />
         <BackgroundGrid theme={theme} />
 
@@ -264,6 +272,10 @@ const App: React.FC = () => {
           setIsContactOpen={setIsContactOpen}
           copyToClipboard={copyToClipboard}
         />
+        
+        {/* Spacer for mobile navbar - only before footer */}
+        <div className="pb-20 md:pb-0" />
+        
         <Footer scrollToSection={scrollToSection} />
 
         {/* Contact Sheet */}
