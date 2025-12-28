@@ -81,6 +81,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete, name }) => {
             className={`
                 fixed inset-0 z-[1000] bg-neo-black flex flex-col justify-between p-4 sm:p-8 font-sans
                 transition-transform duration-700 ease-[cubic-bezier(0.87,0,0.13,1)] will-change-transform
+                w-screen h-screen max-w-full max-h-full overflow-hidden
                 ${isCompleting ? '-translate-y-full' : 'translate-y-0'}
             `}
         >

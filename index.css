@@ -8,6 +8,13 @@ html {
   scroll-padding-top: 80px; /* Offset for fixed header */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Prevent mobile zoom issues */
+html, body {
+  touch-action: manipulation;
 }
 
 /* Only smooth scroll if user hasn't requested reduced motion */
