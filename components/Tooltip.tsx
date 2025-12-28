@@ -5,9 +5,10 @@ interface TooltipProps {
   children: React.ReactNode;
   position?: 'top' | 'bottom' | 'left' | 'right';
   className?: string;
+  disabled?: boolean;
 }
 
-const Tooltip: React.FC<TooltipProps> = ({ text, children, position = 'top', className = '' }) => {
+const Tooltip: React.FC<TooltipProps> = ({ text, children, position = 'top', className = '', disabled = false }) => {
   // 1. Positioning Classes (Outer Div)
   // These handle strict placement relative to the parent.
   // We use -translate-x/y-1/2 to center the tooltip geometrically.
@@ -51,25 +52,27 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children, position = 'top', cla
       {children}
       
       {/* OUTER POSITIONER: Handles strictly layout/positioning */}
-      <div 
-        role="tooltip"
-        className={`absolute ${getPositionClasses()} z-[100] pointer-events-none flex flex-col items-center justify-center`}
-      >
-        {/* INNER ANIMATOR: Handles opacity and slide transitions */}
+      {!disabled && (
         <div 
-          className={`
-            ${getAnimationClasses()}
-            bg-neo-black text-neo-white dark:bg-neo-dark-border dark:text-neo-dark-bg
-            px-3 py-1.5 font-mono font-bold text-xs uppercase tracking-wider
-            border-2 border-black dark:border-neo-dark-border
-            whitespace-nowrap shadow-neo-sm dark:shadow-neo-sm-dark
-            opacity-0 group-hover/tooltip:opacity-100 group-focus-within/tooltip:opacity-100
-            transition-all duration-200 ease-out
-          `}
+          role="tooltip"
+          className={`absolute ${getPositionClasses()} z-[100] pointer-events-none flex flex-col items-center justify-center`}
         >
-          {text}
+          {/* INNER ANIMATOR: Handles opacity and slide transitions */}
+          <div 
+            className={`
+              ${getAnimationClasses()}
+              bg-neo-black text-neo-white dark:bg-neo-dark-border dark:text-neo-dark-bg
+              px-3 py-1.5 font-mono font-bold text-xs uppercase tracking-wider
+              border-2 border-black dark:border-neo-dark-border
+              whitespace-nowrap shadow-neo-sm dark:shadow-neo-sm-dark
+              opacity-0 group-hover/tooltip:opacity-100 group-focus-within/tooltip:opacity-100
+              transition-all duration-200 ease-out
+            `}
+          >
+            {text}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

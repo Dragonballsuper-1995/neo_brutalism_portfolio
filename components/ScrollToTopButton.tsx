@@ -5,6 +5,7 @@ import Tooltip from './Tooltip';
 
 const ScrollToTopButton: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
   const progressRectRef = useRef<SVGRectElement>(null);
 
   // Square Progress Configuration
@@ -23,6 +24,11 @@ const ScrollToTopButton: React.FC = () => {
       
       // Show button after scrolling down 100px
       setIsVisible(scrollTop > 100);
+      
+      // Reset isScrolling when we reach the top
+      if (scrollTop <= 10) {
+        setIsScrolling(false);
+      }
 
       // Calculate progress and update DOM directly
       const totalScroll = docHeight - winHeight;
@@ -49,6 +55,7 @@ const ScrollToTopButton: React.FC = () => {
   }, [perimeter]);
 
   const scrollToTop = () => {
+    setIsScrolling(true); // Hide tooltip immediately
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -59,9 +66,10 @@ const ScrollToTopButton: React.FC = () => {
         ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'}
       `}
     >
-      <Tooltip text="Scroll to Top" position="left" className="transition-transform duration-300 hover:-translate-y-2">
+      <Tooltip text="Scroll to Top" position="left" className="transition-transform duration-300 hover:-translate-y-2" disabled={isScrolling}>
         <button
           onClick={scrollToTop}
+          onMouseLeave={() => setIsScrolling(false)}
           className="
             group relative flex items-center justify-center 
             w-[60px] h-[60px] 
