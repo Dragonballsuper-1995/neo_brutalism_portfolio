@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface TooltipProps {
   text: string;
@@ -9,6 +9,8 @@ interface TooltipProps {
 }
 
 const Tooltip: React.FC<TooltipProps> = ({ text, children, position = 'top', className = '', disabled = false }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
   // 1. Positioning Classes (Outer Div)
   // These handle strict placement relative to the parent.
   // We use -translate-x/y-1/2 to center the tooltip geometrically.
@@ -29,50 +31,52 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children, position = 'top', cla
 
   // 2. Animation Classes (Inner Div)
   // These handle the slide-in and fade-in effects.
-  // By separating this from positioning, we avoid CSS transform conflicts.
   const getAnimationClasses = () => {
+    const baseVisible = isHovered && !disabled;
     switch (position) {
       case 'top':
-        return 'translate-y-2 group-hover/tooltip:translate-y-0';
+        return baseVisible ? 'translate-y-0' : 'translate-y-2';
       case 'bottom':
-        return '-translate-y-2 group-hover/tooltip:translate-y-0';
+        return baseVisible ? 'translate-y-0' : '-translate-y-2';
       case 'left':
-        return 'translate-x-2 group-hover/tooltip:translate-x-0';
+        return baseVisible ? 'translate-x-0' : 'translate-x-2';
       case 'right':
-        return '-translate-x-2 group-hover/tooltip:translate-x-0';
+        return baseVisible ? 'translate-x-0' : '-translate-x-2';
       default:
-        return 'translate-y-2 group-hover/tooltip:translate-y-0';
+        return baseVisible ? 'translate-y-0' : 'translate-y-2';
     }
   };
 
+  const showTooltip = isHovered && !disabled;
+
   return (
-    // We use 'group/tooltip' (Named Group) to isolate this component's hover state 
-    // from any outer containers that might also have the 'group' class.
-    <div className={`relative group/tooltip inline-flex items-center justify-center ${className}`}>
+    <div 
+      className={`relative inline-flex items-center justify-center ${className}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {children}
       
       {/* OUTER POSITIONER: Handles strictly layout/positioning */}
-      {!disabled && (
+      <div 
+        role="tooltip"
+        className={`absolute ${getPositionClasses()} z-[100] pointer-events-none flex flex-col items-center justify-center`}
+      >
+        {/* INNER ANIMATOR: Handles opacity and slide transitions */}
         <div 
-          role="tooltip"
-          className={`absolute ${getPositionClasses()} z-[100] pointer-events-none flex flex-col items-center justify-center`}
+          className={`
+            ${getAnimationClasses()}
+            bg-neo-black text-neo-white dark:bg-neo-dark-border dark:text-neo-dark-bg
+            px-3 py-1.5 font-mono font-bold text-xs uppercase tracking-wider
+            border-2 border-black dark:border-neo-dark-border
+            whitespace-nowrap shadow-neo-sm dark:shadow-neo-sm-dark
+            transition-all duration-200 ease-out
+            ${showTooltip ? 'opacity-100' : 'opacity-0'}
+          `}
         >
-          {/* INNER ANIMATOR: Handles opacity and slide transitions */}
-          <div 
-            className={`
-              ${getAnimationClasses()}
-              bg-neo-black text-neo-white dark:bg-neo-dark-border dark:text-neo-dark-bg
-              px-3 py-1.5 font-mono font-bold text-xs uppercase tracking-wider
-              border-2 border-black dark:border-neo-dark-border
-              whitespace-nowrap shadow-neo-sm dark:shadow-neo-sm-dark
-              opacity-0 group-hover/tooltip:opacity-100 group-focus-within/tooltip:opacity-100
-              transition-all duration-200 ease-out
-            `}
-          >
-            {text}
-          </div>
+          {text}
         </div>
-      )}
+      </div>
     </div>
   );
 };
