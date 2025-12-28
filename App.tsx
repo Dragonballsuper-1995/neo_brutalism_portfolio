@@ -75,6 +75,14 @@ const App: React.FC = () => {
   const [activeSection, setActiveSection] = useState<NavSection>(NavSection.HERO);
   const [toast, setToast] = useState({ message: '', visible: false, type: 'success' as 'success' | 'error' });
 
+  // Force scroll to top on page load/refresh - override browser's scroll restoration
+  useEffect(() => {
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+  }, []);
+
   const handleLoadingComplete = useCallback(() => {
     setIsLoading(false);
     // Reduced timeout to match the faster 700ms animation in LoadingScreen
