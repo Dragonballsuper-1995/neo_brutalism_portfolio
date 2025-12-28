@@ -212,8 +212,14 @@ const App: React.FC = () => {
     // Sheets handle their own scroll locking, so we check for others here
     if (shouldLock) {
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      // Reset scroll to top when loading screen is mounted
+      if (isLoaderMounted) {
+        window.scrollTo(0, 0);
+      }
     } else if (!isContactOpen && !selectedProject) {
       document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
     }
     
     return () => {
