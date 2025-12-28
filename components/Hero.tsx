@@ -9,6 +9,7 @@ import { NavSection } from '../types';
 import { PERSONAL_INFO } from '../constants';
 import LiveStatus from './LiveStatus';
 import ScrollAnimation from './ui/ScrollAnimation';
+import Tooltip from './Tooltip';
 
 interface HeroProps {
   scrollToSection: (id: NavSection) => void;
@@ -72,22 +73,24 @@ const Hero: React.FC<HeroProps> = ({ scrollToSection }) => {
 
         {/* Scroll Down Button */}
         <ScrollAnimation variant="fadeIn" delay={1.8} className="mt-16 md:mt-24 mb-10 no-print" animateOnMount>
-          <button
-            aria-label="Scroll to about section"
-            onClick={() => scrollToSection(NavSection.ABOUT)}
-            className="
-              group flex items-center justify-center 
-              w-[60px] h-[60px] 
-              bg-neo-yellow dark:bg-neo-purple 
-              border-4 border-black dark:border-white
-              shadow-neo-lg dark:shadow-neo-lg-dark 
-              hover:shadow-neo-xl dark:hover:shadow-neo-xl 
-              transition-all duration-300 hover:-translate-y-2
-              cursor-pointer animate-bounce
-            "
-          >
-            <ArrowDown size={28} strokeWidth={3} className="text-black dark:text-white relative z-10 group-hover:scale-110 transition-transform" />
-          </button>
+          <Tooltip text="Scroll Down" position="left">
+            <button
+              aria-label="Scroll to about section"
+              onClick={() => scrollToSection(NavSection.ABOUT)}
+              className="
+                group flex items-center justify-center 
+                w-[60px] h-[60px] 
+                bg-neo-yellow dark:bg-neo-purple 
+                border-4 border-black dark:border-white
+                shadow-neo-lg dark:shadow-neo-lg-dark 
+                hover:shadow-neo-xl dark:hover:shadow-neo-xl 
+                transition-all duration-300 hover:-translate-y-2
+                cursor-pointer animate-bounce
+              "
+            >
+              <ArrowDown size={28} strokeWidth={3} className="text-black dark:text-white relative z-10 group-hover:scale-110 transition-transform" />
+            </button>
+          </Tooltip>
         </ScrollAnimation>
       </div>
     </Section>
