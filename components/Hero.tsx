@@ -33,13 +33,13 @@ const Hero: React.FC<HeroProps> = ({ scrollToSection }) => {
       <div className="relative z-10 max-w-5xl mx-auto px-4 pt-10 md:pt-20 flex flex-col items-center">
         
         {/* Feature 1: Live Status Widget - Delayed to appear after loader curtain lifts */}
-        <ScrollAnimation variant="fadeIn" delay={0.6}>
+        <ScrollAnimation variant="fadeIn" delay={0.6} animateOnMount>
           <LiveStatus />
         </ScrollAnimation>
 
         <div className="relative mb-2">
           {/* Main Name - Delayed further for cascade effect */}
-          <ScrollAnimation variant="blur" duration={0.8} delay={0.8}>
+          <ScrollAnimation variant="blur" duration={0.8} delay={0.8} animateOnMount>
             <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black uppercase leading-none tracking-tighter text-neo-black dark:text-neo-dark-text mb-2 drop-shadow-[4px_4px_0px_rgba(126,217,87,1)] dark:drop-shadow-[4px_4px_0px_rgba(140,82,255,1)]">
               <span className="block">{nameLine1}</span>
               <span className="block">{nameLine2}</span>
@@ -47,7 +47,7 @@ const Hero: React.FC<HeroProps> = ({ scrollToSection }) => {
           </ScrollAnimation>
         </div>
 
-        <ScrollAnimation variant="scale" delay={1.0} className="relative mb-10">
+        <ScrollAnimation variant="scale" delay={1.0} className="relative mb-10" animateOnMount>
           <div className="inline-block relative">
             <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold font-mono uppercase bg-white text-black dark:bg-black dark:text-white px-6 py-2 border-4 border-black dark:border-neo-dark-border transform -rotate-1 shadow-neo dark:shadow-neo-dark min-h-[3.5rem] md:min-h-[4.5rem] flex items-center justify-center">
               <CipherReveal texts={PHRASES} wait={1500} />
@@ -55,13 +55,13 @@ const Hero: React.FC<HeroProps> = ({ scrollToSection }) => {
           </div>
         </ScrollAnimation>
         
-        <ScrollAnimation variant="fadeUp" delay={1.2} className="max-w-3xl mx-auto">
+        <ScrollAnimation variant="fadeUp" delay={1.2} className="max-w-3xl mx-auto" animateOnMount>
           <div className="text-lg md:text-xl font-mono bg-white dark:bg-neo-dark-surface dark:text-neo-dark-text border-2 border-black dark:border-neo-dark-border p-6 inline-block shadow-neo dark:shadow-neo-dark leading-relaxed hover:shadow-neo-lg dark:hover:shadow-neo-lg-dark transition-all duration-300 hover:-translate-y-1">
             <TextReveal text={PERSONAL_INFO.tagline} mode="word" delay={0.2} />
           </div>
         </ScrollAnimation>
         
-        <ScrollAnimation variant="fadeUp" delay={1.4} className="flex flex-col md:flex-row gap-6 justify-center mt-12 no-print w-full max-w-lg md:max-w-none">
+        <ScrollAnimation variant="fadeUp" delay={1.4} className="flex flex-col md:flex-row gap-6 justify-center mt-12 no-print w-full max-w-lg md:max-w-none" animateOnMount>
           <NeoButton onClick={() => scrollToSection(NavSection.PROJECTS)} className="text-xl py-4 px-10 w-full md:w-auto">
             View My Work
           </NeoButton>
@@ -71,7 +71,7 @@ const Hero: React.FC<HeroProps> = ({ scrollToSection }) => {
         </ScrollAnimation>
 
         {/* Scroll Down Button */}
-        <ScrollAnimation variant="fadeIn" delay={1.8} className="mt-16 md:mt-24 mb-10 no-print">
+        <ScrollAnimation variant="fadeIn" delay={1.8} className="mt-16 md:mt-24 mb-10 no-print" animateOnMount>
           <button
             aria-label="Scroll to about section"
             onClick={() => scrollToSection(NavSection.ABOUT)}

@@ -10,6 +10,7 @@ interface ScrollAnimationProps {
   once?: boolean;
   viewportMargin?: string;
   style?: React.CSSProperties;
+  animateOnMount?: boolean; // If true, animate immediately without waiting for viewport
 }
 
 const variantsMap: Record<string, Variants> = {
@@ -48,14 +49,31 @@ const ScrollAnimation: React.FC<ScrollAnimationProps> = ({
   once = true,
   viewportMargin = "-50px",
   style,
+  animateOnMount = false,
 }) => {
+  // If animateOnMount is true, use animate prop directly instead of whileInView
+  if (animateOnMount) {
+    return (
+      <motion.div
+        variants={variantsMap[variant]}
+        initial="hidden"
+        animate="visible"
+        transition={{ duration, delay, ease: [0.22, 1, 0.36, 1] }}
+        className={className}
+        style={style}
+      >
+        {children}
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       variants={variantsMap[variant]}
       initial="hidden"
       whileInView="visible"
       viewport={{ once, margin: viewportMargin }}
-      transition={{ duration, delay, ease: [0.22, 1, 0.36, 1] }} // Custom cubic-bezier for "tasteful" smooth feel
+      transition={{ duration, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
       style={style}
     >
