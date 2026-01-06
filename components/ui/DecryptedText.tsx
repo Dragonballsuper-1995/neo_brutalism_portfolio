@@ -7,6 +7,7 @@ interface DecryptedTextProps {
   characters?: string;
   speed?: number;
   useOriginalCharsOnly?: boolean;
+  once?: boolean; // Only animate once, don't reset on scroll out/in
 }
 
 const DEFAULT_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_+-=";
@@ -15,21 +16,25 @@ export const DecryptedText: React.FC<DecryptedTextProps> = ({
   text,
   className = "",
   characters = DEFAULT_CHARS,
-  speed = 15,
+  speed = 30, // Increased from 15ms to 30ms for better performance
   useOriginalCharsOnly = false,
+  once = true, // Default to only animating once per page load
 }) => {
   const [displayText, setDisplayText] = useState(text);
   const [isScrambling, setIsScrambling] = useState(false);
   const containerRef = useRef<HTMLSpanElement>(null);
   const [isInView, setIsInView] = useState(false);
+  const hasAnimatedRef = useRef(false); // Track if animation already happened
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !isScrambling) {
+          // If 'once' is true and already animated, skip
+          if (once && hasAnimatedRef.current) return;
           setIsInView(true);
-        } else if (!entry.isIntersecting) {
-          // Reset when element leaves view so it can animate again
+        } else if (!entry.isIntersecting && !once) {
+          // Only reset when scrolling out if 'once' is false
           setIsInView(false);
           setDisplayText(text);
           setIsScrambling(false);
@@ -43,10 +48,11 @@ export const DecryptedText: React.FC<DecryptedTextProps> = ({
     }
 
     return () => observer.disconnect();
-  }, [text, isScrambling]);
+  }, [text, isScrambling, once]);
 
   useEffect(() => {
     if (isInView && !isScrambling) {
+      hasAnimatedRef.current = true;
       scramble();
     }
   }, [isInView]);
@@ -65,18 +71,18 @@ export const DecryptedText: React.FC<DecryptedTextProps> = ({
 
             // Determine if this character should be revealed
             // We reveal from left to right gradually based on total progress
-            
+
             // Simple logic: reveal one character every 3 ticks
-            const progress = Math.floor(iteration / 3); 
-            
+            const progress = Math.floor(iteration / 3);
+
             if (index < progress) {
               return text[index];
             }
 
             // Return random character
             if (useOriginalCharsOnly) {
-                const randomOriginalIndex = Math.floor(Math.random() * text.length);
-                return text[randomOriginalIndex];
+              const randomOriginalIndex = Math.floor(Math.random() * text.length);
+              return text[randomOriginalIndex];
             }
             return characters[Math.floor(Math.random() * characters.length)];
           })
@@ -88,7 +94,7 @@ export const DecryptedText: React.FC<DecryptedTextProps> = ({
         setDisplayText(text);
         setIsScrambling(false);
       }
-      
+
       iteration++;
     }, speed);
   };

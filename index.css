@@ -1,11 +1,11 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* Global Styles & Optimization */
 html {
-  scroll-padding-top: 80px; /* Offset for fixed header */
+  scroll-padding-top: 80px;
+  /* Offset for fixed header */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   overflow-x: hidden;
@@ -13,7 +13,8 @@ html {
 }
 
 /* Prevent mobile zoom issues */
-html, body {
+html,
+body {
   touch-action: manipulation;
 }
 
@@ -26,20 +27,28 @@ html, body {
 
 /* Base Styles */
 body {
-  @apply bg-neo-white dark:bg-neo-dark-bg text-neo-black dark:text-neo-dark-text transition-colors duration-300;
+  @apply bg-neo-white dark:bg-neo-dark-bg text-neo-black dark:text-neo-dark-text transition-colors duration-150;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Section render optimization - skip rendering off-screen sections */
+section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 14px;
 }
+
 ::-webkit-scrollbar-track {
   background: #fff;
   border-left: 3px solid #000;
 }
+
 html.dark ::-webkit-scrollbar-track {
   background: #000000;
   border-left: 3px solid #FFFFFF;
@@ -50,6 +59,7 @@ html.dark ::-webkit-scrollbar-track {
   border: 3px solid #000;
   border-right: none;
 }
+
 html.dark ::-webkit-scrollbar-thumb {
   background: #FFFFFF;
   border: 3px solid #FFFFFF;
@@ -59,6 +69,7 @@ html.dark ::-webkit-scrollbar-thumb {
 ::-webkit-scrollbar-thumb:hover {
   background: #FFDE59;
 }
+
 html.dark ::-webkit-scrollbar-thumb:hover {
   background: #7ED957;
 }
@@ -68,6 +79,7 @@ html.dark ::-webkit-scrollbar-thumb:hover {
   background-image: radial-gradient(#000 2px, transparent 2px);
   background-size: 30px 30px;
 }
+
 html.dark .bg-grid-pattern {
   background-image: radial-gradient(#FFFFFF 2px, transparent 2px);
 }
@@ -85,17 +97,111 @@ html.dark .bg-grid-pattern {
   transform: translateY(0);
 }
 
-.delay-100 { transition-delay: 100ms; }
-.delay-200 { transition-delay: 200ms; }
-.delay-300 { transition-delay: 300ms; }
+.delay-100 {
+  transition-delay: 100ms;
+}
+
+.delay-200 {
+  transition-delay: 200ms;
+}
+
+.delay-300 {
+  transition-delay: 300ms;
+}
 
 /* Helper for GPU acceleration */
 .will-change-transform {
   will-change: transform;
 }
 
+/* ============================================
+   Centralized Animation Keyframes
+   ============================================ */
+
+/* Modal scale in animation */
+@keyframes scaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Confetti fall animation */
+@keyframes fall {
+  0% {
+    transform: translateY(-10%) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(60vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Wavy underline animation for About section */
+@keyframes waveMove {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 20px 0;
+  }
+}
+
+/* Slide in from bottom */
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Wavy underline utility class */
+.wavy-underline {
+  position: relative;
+  display: inline-block;
+  z-index: 10;
+}
+
+.wavy-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -9px;
+  width: 100%;
+  height: 12px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 4'%3E%3Cpath d='M0 3c2.5 0 2.5-3 5-3s2.5 3 5 3 2.5-3 5-3 2.5 3 5 3' fill='none' stroke='%23FF66C4' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 20px 12px;
+  animation: waveMove 0.5s linear infinite;
+}
+
 /* CUSTOM CURSOR LOGIC */
 @media (hover: hover) and (pointer: fine) {
+
   body.has-custom-cursor,
   body.has-custom-cursor a,
   body.has-custom-cursor button,
@@ -115,16 +221,27 @@ html.dark .bg-grid-pattern {
 
 /* Print Styles */
 @media print {
-  header, footer, .no-print, [role="dialog"], button, canvas, .cursor-follower, .custom-cursor { 
-    display: none !important; 
+
+  header,
+  footer,
+  .no-print,
+  [role="dialog"],
+  button,
+  canvas,
+  .cursor-follower,
+  .custom-cursor {
+    display: none !important;
   }
-  body, main { 
-    background: white !important; 
-    color: black !important; 
+
+  body,
+  main {
+    background: white !important;
+    color: black !important;
   }
-  section { 
-    border: none !important; 
-    page-break-inside: avoid; 
+
+  section {
+    border: none !important;
+    page-break-inside: avoid;
     min-height: auto !important;
   }
 }

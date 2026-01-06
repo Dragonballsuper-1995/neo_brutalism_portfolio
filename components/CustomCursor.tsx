@@ -47,11 +47,13 @@ const CustomCursor: React.FC<CustomCursorProps> = ({ highContrast = false }) => 
       return;
     }
 
+    // Use direct DOM manipulation for position updates (no React re-renders)
     const moveCursor = (e: MouseEvent) => {
       setIsVisible(true);
 
       const { clientX, clientY } = e;
 
+      // Direct style manipulation - bypasses React state updates
       if (cursorRef.current) {
         cursorRef.current.style.transform = `translate3d(${clientX}px, ${clientY}px, 0)`;
       }
@@ -75,8 +77,9 @@ const CustomCursor: React.FC<CustomCursorProps> = ({ highContrast = false }) => 
     const handleMouseLeave = () => setIsVisible(false);
     const handleMouseEnter = () => setIsVisible(true);
 
-    window.addEventListener('mousemove', moveCursor);
-    window.addEventListener('mouseover', handleMouseOver);
+    // Use passive listeners for better scroll performance
+    window.addEventListener('mousemove', moveCursor, { passive: true });
+    window.addEventListener('mouseover', handleMouseOver, { passive: true });
     window.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mouseup', handleMouseUp);
     document.addEventListener('mouseleave', handleMouseLeave);
@@ -98,7 +101,7 @@ const CustomCursor: React.FC<CustomCursorProps> = ({ highContrast = false }) => 
   return (
     <>
       {/* Inner Crosshair Cursor */}
-      <div 
+      <div
         ref={cursorRef}
         aria-hidden="true"
         className={`fixed top-0 left-0 z-[10000] pointer-events-none ${blendModeClass}`}
@@ -115,9 +118,9 @@ const CustomCursor: React.FC<CustomCursorProps> = ({ highContrast = false }) => 
           <div className={`absolute top-1/2 left-0 w-full h-[2px] -translate-y-1/2 rotate-90 ${strokeClass}`} />
         </div>
       </div>
-      
+
       {/* Outer Ring Follower */}
-      <div 
+      <div
         ref={followerRef}
         aria-hidden="true"
         className={`

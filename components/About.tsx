@@ -11,7 +11,7 @@ import { CHARACTER_TRAITS } from '../constants';
 import ScrollAnimation from './ui/ScrollAnimation';
 
 const About: React.FC = () => {
-  
+
   const renderTraitIcon = (type: string) => {
     switch (type) {
       case 'custom-f1':
@@ -28,8 +28,8 @@ const About: React.FC = () => {
       case 'custom-anime':
         return (
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-4 relative z-10">
-              <circle cx="12" cy="12" r="10" />
-              <path d="m12 8 1.5 3h3l-2.5 2 1 3-3-2-3 2 1-3-2.5-2h3z" fill="currentColor" />
+            <circle cx="12" cy="12" r="10" />
+            <path d="m12 8 1.5 3h3l-2.5 2 1 3-3-2-3 2 1-3-2.5-2h3z" fill="currentColor" />
           </svg>
         );
       case 'lucide-coffee':
@@ -43,30 +43,8 @@ const About: React.FC = () => {
 
   return (
     <Section id={NavSection.ABOUT} className="border-b-4 border-black dark:border-neo-dark-border">
-      <style>{`
-        @keyframes waveMove {
-          0% { background-position: 0 0; }
-          100% { background-position: 20px 0; }
-        }
-        .wavy-underline {
-          position: relative;
-          display: inline-block;
-          z-index: 10;
-        }
-        .wavy-underline::after {
-          content: '';
-          position: absolute;
-          left: 0;
-          bottom: -9px;
-          width: 100%;
-          height: 12px; 
-          background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 4' fill='none' stroke='%23FF66C4' stroke-width='6'%3E%3Cpath d='M0 3.5c5 0 5-3 10-3s5 3 10 3 5-3 10 3 5 3 10 3'/%3E%3C/svg%3E") repeat-x 0 0;
-          background-size: 20px 12px; 
-          animation: waveMove 1s linear infinite;
-          z-index: -1; 
-        }
-      `}</style>
-      
+      {/* Wavy underline animation is now in index.css */}
+
       <ScrollAnimation variant="fadeUp" className="flex flex-col items-center mb-16">
         <div className="bg-neo-black text-white px-4 py-1 font-mono text-sm font-bold mb-4 uppercase tracking-widest transform -rotate-2">
           File: profile_data.txt
@@ -81,30 +59,30 @@ const About: React.FC = () => {
         <div className="lg:col-span-5 flex flex-col gap-6">
           <ScrollAnimation variant="slideRight" delay={0.1}>
             <div className="relative group">
-                <div className="absolute inset-0 bg-neo-purple translate-x-4 translate-y-4 border-4 border-black transition-transform group-hover:translate-x-8 group-hover:translate-y-8"></div>
-                <div className="relative border-4 border-black bg-white p-2 z-10 transform transition-transform group-hover:-translate-y-2 group-hover:-translate-x-2">
-                    <div className="aspect-[4/5] overflow-hidden border-2 border-black relative">
-                    <img
-                      src="/profile-pic-4.webp"
-                        alt="Sujal Chhajed"
-                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-100 group-hover:scale-110"
-                        loading="lazy"
-                        decoding="async"
-                        width="800"
-                        height="1000"
-                    />
-                    <div className="absolute bottom-0 left-0 w-full bg-black/80 p-2 backdrop-blur-sm transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                        <p className="text-white font-mono text-xs text-center"> &gt; SYSTEM.ROOT.USER </p>
-                    </div>
-                    </div>
+              <div className="absolute inset-0 bg-neo-purple translate-x-4 translate-y-4 border-4 border-black transition-transform group-hover:translate-x-8 group-hover:translate-y-8"></div>
+              <div className="relative border-4 border-black bg-white p-2 z-10 transform transition-transform group-hover:-translate-y-2 group-hover:-translate-x-2">
+                <div className="aspect-[4/5] overflow-hidden border-2 border-black relative">
+                  <img
+                    src="/profile-pic-4.webp"
+                    alt="Sujal Chhajed"
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-100 group-hover:scale-110"
+                    loading="lazy"
+                    decoding="async"
+                    width="800"
+                    height="1000"
+                  />
+                  <div className="absolute bottom-0 left-0 w-full bg-black/80 p-2 backdrop-blur-sm transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                    <p className="text-white font-mono text-xs text-center"> &gt; SYSTEM.ROOT.USER </p>
+                  </div>
                 </div>
-                <div className="absolute -top-6 -right-6 bg-neo-yellow border-4 border-black p-4 rounded-full shadow-neo animate-[spin_10s_linear_infinite] z-20 hidden md:block" style={{ transform: 'translateZ(50px)' }}>
-                    <Zap size={32} className="text-black" />
-                </div>
+              </div>
+              <div className="absolute -top-6 -right-6 bg-neo-yellow border-4 border-black p-4 rounded-full shadow-neo z-20 hidden md:block group-hover:animate-[spin_2s_linear_infinite] transition-transform" style={{ transform: 'translateZ(50px)' }}>
+                <Zap size={32} className="text-black" />
+              </div>
             </div>
           </ScrollAnimation>
         </div>
-        
+
         <div className="lg:col-span-7 flex flex-col gap-8">
           <ScrollAnimation variant="slideLeft" delay={0.2}>
             <div className="bg-white dark:bg-neo-dark-surface p-8 border-l-8 border-neo-purple shadow-sm border-y-4 border-r-4 border-black dark:border-neo-dark-border">
@@ -121,50 +99,50 @@ const About: React.FC = () => {
               </div>
             </div>
           </ScrollAnimation>
-          
+
           {/* Accordion Section for structured data */}
           <ScrollAnimation variant="fadeUp" delay={0.3}>
             <Accordion className="mt-4">
-               <AccordionItem title="Education">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-bold text-lg">B.Tech Computer Science (AI & ML)</h4>
-                    <span className="bg-black text-white text-xs px-2 py-1 dark:bg-white dark:text-black">2021 - Present</span>
+              <AccordionItem title="Education">
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-bold text-lg">B.Tech Computer Science (AI & ML)</h4>
+                  <span className="bg-black text-white text-xs px-2 py-1 dark:bg-white dark:text-black">2021 - Present</span>
+                </div>
+                <p className="mb-2 text-neo-purple font-bold">VIT Chennai</p>
+                <p className="opacity-80">Specializing in Artificial Intelligence and Machine Learning algorithms, with a focus on Deep Learning and Computer Vision.</p>
+              </AccordionItem>
+              <AccordionItem title="Technical Arsenal">
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div className="p-2 border border-gray-200 dark:border-zinc-800">
+                    <strong className="block mb-1 text-neo-blue">Languages</strong>
+                    Python, JavaScript, TypeScript, C++, SQL
                   </div>
-                  <p className="mb-2 text-neo-purple font-bold">VIT Chennai</p>
-                  <p className="opacity-80">Specializing in Artificial Intelligence and Machine Learning algorithms, with a focus on Deep Learning and Computer Vision.</p>
-               </AccordionItem>
-               <AccordionItem title="Technical Arsenal">
-                 <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div className="p-2 border border-gray-200 dark:border-zinc-800">
-                       <strong className="block mb-1 text-neo-blue">Languages</strong>
-                       Python, JavaScript, TypeScript, C++, SQL
-                    </div>
-                    <div className="p-2 border border-gray-200 dark:border-zinc-800">
-                       <strong className="block mb-1 text-neo-green">Frameworks</strong>
-                       React, Next.js, TensorFlow, PyTorch, Tailwind
-                    </div>
-                    <div className="p-2 border border-gray-200 dark:border-zinc-800">
-                       <strong className="block mb-1 text-neo-orange">Tools</strong>
-                       Docker, Git, AWS, Vercel, Figma
-                    </div>
-                 </div>
-               </AccordionItem>
-               <AccordionItem title="Experience">
-                  <div className="mb-4 border-b border-gray-200 dark:border-zinc-700 pb-2">
-                    <div className="flex justify-between items-start">
-                       <h4 className="font-bold">AI/ML Developer</h4>
-                       <span className="text-xs font-bold opacity-60">Freelance</span>
-                    </div>
-                    <p className="text-sm mt-1">Building custom NLP solutions and automating workflows for clients.</p>
+                  <div className="p-2 border border-gray-200 dark:border-zinc-800">
+                    <strong className="block mb-1 text-neo-green">Frameworks</strong>
+                    React, Next.js, TensorFlow, PyTorch, Tailwind
                   </div>
-                  <div>
-                    <div className="flex justify-between items-start">
-                       <h4 className="font-bold">Full Stack Developer</h4>
-                       <span className="text-xs font-bold opacity-60">Projects</span>
-                    </div>
-                    <p className="text-sm mt-1">Developed multiple high-performance web applications featured in my portfolio.</p>
+                  <div className="p-2 border border-gray-200 dark:border-zinc-800">
+                    <strong className="block mb-1 text-neo-orange">Tools</strong>
+                    Docker, Git, AWS, Vercel, Figma
                   </div>
-               </AccordionItem>
+                </div>
+              </AccordionItem>
+              <AccordionItem title="Experience">
+                <div className="mb-4 border-b border-gray-200 dark:border-zinc-700 pb-2">
+                  <div className="flex justify-between items-start">
+                    <h4 className="font-bold">AI/ML Developer</h4>
+                    <span className="text-xs font-bold opacity-60">Freelance</span>
+                  </div>
+                  <p className="text-sm mt-1">Building custom NLP solutions and automating workflows for clients.</p>
+                </div>
+                <div>
+                  <div className="flex justify-between items-start">
+                    <h4 className="font-bold">Full Stack Developer</h4>
+                    <span className="text-xs font-bold opacity-60">Projects</span>
+                  </div>
+                  <p className="text-sm mt-1">Developed multiple high-performance web applications featured in my portfolio.</p>
+                </div>
+              </AccordionItem>
             </Accordion>
           </ScrollAnimation>
         </div>
@@ -179,7 +157,7 @@ const About: React.FC = () => {
           </h3>
           <div className="h-1 flex-grow bg-black dark:bg-white/20"></div>
         </ScrollAnimation>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {CHARACTER_TRAITS.map((trait, index) => (
             <ScrollAnimation key={trait.id} variant="scale" delay={index * 0.1}>

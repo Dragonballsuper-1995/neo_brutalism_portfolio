@@ -33,7 +33,7 @@ const BackgroundGrid: React.FC<BackgroundGridProps> = ({ theme }) => {
       const dpr = window.devicePixelRatio || 1;
       width = window.innerWidth;
       height = window.innerHeight;
-      
+
       canvas.width = width * dpr;
       canvas.height = height * dpr;
       canvas.style.width = `${width}px`;
@@ -46,7 +46,7 @@ const BackgroundGrid: React.FC<BackgroundGridProps> = ({ theme }) => {
     const draw = () => {
       frameRequested = false;
       ctx.clearRect(0, 0, width, height);
-      
+
       const space = 40; // Grid spacing
       // Center the grid slightly
       const offsetX = (width % space) / 2;
@@ -63,7 +63,7 @@ const BackgroundGrid: React.FC<BackgroundGridProps> = ({ theme }) => {
         for (let c = 0; c <= cols; c++) {
           const x = offsetX + c * space;
           const y = offsetY + r * space;
-          
+
           // Distance from mouse
           const dx = mouse.x - x;
           const dy = mouse.y - y;
@@ -77,7 +77,7 @@ const BackgroundGrid: React.FC<BackgroundGridProps> = ({ theme }) => {
           if (dist < hoverRadius) {
             // Interactive effect
             const intensity = 1 - (dist / hoverRadius);
-            
+
             // Scale up based on proximity
             radius = baseRadius + (intensity * 4); // Grows up to ~5.5px
           }
@@ -113,6 +113,10 @@ const BackgroundGrid: React.FC<BackgroundGridProps> = ({ theme }) => {
 
     window.addEventListener('resize', handleResize);
 
+    // Throttle helper for mousemove (16ms = ~60fps cap)
+    let lastMoveTime = 0;
+    const THROTTLE_MS = 16;
+
     const bindPointerListeners = () => {
       // Remove any existing listeners first.
       if (handleMouseMove) window.removeEventListener('mousemove', handleMouseMove);
@@ -123,6 +127,10 @@ const BackgroundGrid: React.FC<BackgroundGridProps> = ({ theme }) => {
       if (isCoarsePointer) return;
 
       handleMouseMove = (e: MouseEvent) => {
+        const now = performance.now();
+        if (now - lastMoveTime < THROTTLE_MS) return; // Skip if within throttle window
+        lastMoveTime = now;
+
         mouse.x = e.clientX;
         mouse.y = e.clientY;
         requestDraw();
@@ -134,7 +142,7 @@ const BackgroundGrid: React.FC<BackgroundGridProps> = ({ theme }) => {
         requestDraw();
       };
 
-      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mousemove', handleMouseMove, { passive: true });
       document.addEventListener('mouseleave', handleMouseLeave);
     };
 
@@ -162,9 +170,10 @@ const BackgroundGrid: React.FC<BackgroundGridProps> = ({ theme }) => {
   }, [theme]);
 
   return (
-    <canvas 
-      ref={canvasRef} 
-      className="fixed inset-0 z-0 pointer-events-none transition-colors duration-500"
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 z-0 pointer-events-none"
+      style={{ willChange: 'transform' }}
       aria-hidden="true"
     />
   );

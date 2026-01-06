@@ -21,6 +21,7 @@ import ProjectCaseStudy from './components/ProjectCaseStudy';
 import MobileNavBar from './components/MobileNavBar';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from './components/ui/Sheet';
 
+import { useTheme, useScrollSpy } from './hooks';
 import { PERSONAL_INFO } from './constants';
 import { NavSection, Project } from './types';
 
@@ -57,22 +58,13 @@ const App: React.FC = () => {
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isCmdPaletteOpen, setIsCmdPaletteOpen] = useState(false);
-  
+
   // Sheet state for Project Case Study
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  
-  // Theme State with Persistence (Updated: Defaulting to Light Mode)
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    // Check localStorage first
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('theme');
-      if (saved === 'dark' || saved === 'light') return saved;
-    }
-    // Hard default to light mode
-    return 'light';
-  });
 
-  const [activeSection, setActiveSection] = useState<NavSection>(NavSection.HERO);
+  // Custom hooks for theme and scroll spy
+  const { theme, toggleTheme } = useTheme();
+  const activeSection = useScrollSpy();
   const [toast, setToast] = useState({ message: '', visible: false, type: 'success' as 'success' | 'error' });
 
   // Force scroll to top on page load/refresh - override browser's scroll restoration
@@ -104,85 +96,15 @@ const App: React.FC = () => {
 
     // Use requestIdleCallback if available, otherwise fallback to timeout
     if ('requestIdleCallback' in window) {
-       (window as any).requestIdleCallback(preloadImages);
+      (window as any).requestIdleCallback(preloadImages);
     } else {
-       setTimeout(preloadImages, 2000);
+      setTimeout(preloadImages, 2000);
     }
   }, []);
 
   useGlobalScrollReveal(!isLoading);
 
-  // Active Section Spy
-  useEffect(() => {
-    let ticking = false;
-    const sections = Object.values(NavSection);
-
-    const updateActiveSection = () => {
-       const scrollY = window.scrollY;
-       const viewportHeight = window.innerHeight;
-       const triggerPoint = scrollY + (viewportHeight * 0.35);
-       
-       const docHeight = document.documentElement.scrollHeight;
-       // If near bottom of page, always show CONTACT
-       if (scrollY + viewportHeight >= docHeight - 100) {
-         setActiveSection(NavSection.CONTACT);
-         return;
-       }
-       
-       // Check if we're past the contact section start - if so, stay on CONTACT
-       const contactEl = document.getElementById(NavSection.CONTACT);
-       if (contactEl && triggerPoint >= contactEl.offsetTop) {
-         setActiveSection(NavSection.CONTACT);
-         return;
-       }
-
-       let active = NavSection.HERO;
-
-       for (const sectionId of sections) {
-         const el = document.getElementById(sectionId);
-         if (el) {
-           const top = el.offsetTop;
-           const height = el.offsetHeight;
-           
-           if (triggerPoint >= top && triggerPoint < top + height) {
-             active = sectionId as NavSection;
-             break;
-           }
-         }
-       }
-       
-       setActiveSection(active);
-    };
-
-    const onScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          updateActiveSection();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    updateActiveSection();
-
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  // Theme Toggle Logic & Persistence
-  useEffect(() => {
-    localStorage.setItem('theme', theme);
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [theme]);
-
-  const toggleTheme = useCallback(() => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  }, []);
+  // Theme and scroll spy logic now handled by custom hooks
 
   const scrollToSection = useCallback((id: NavSection) => {
     const element = document.getElementById(id);
@@ -237,9 +159,9 @@ const App: React.FC = () => {
       document.body.style.overflow = '';
       document.documentElement.style.overflow = '';
     }
-    
+
     return () => {
-       // Cleanup logic handled mostly by components
+      // Cleanup logic handled mostly by components
     };
   }, [isChatOpen, isLoaderMounted, isCmdPaletteOpen, isContactOpen, selectedProject]);
 
@@ -272,18 +194,18 @@ const App: React.FC = () => {
         <Hero scrollToSection={scrollToSection} />
         <About />
         <Skills />
-        
+
         {/* Pass click handler and theme to ProjectsSection */}
         <ProjectsSection onProjectClick={handleProjectClick} theme={theme} />
-        
+
         <ContactSection
           setIsContactOpen={setIsContactOpen}
           copyToClipboard={copyToClipboard}
         />
-        
+
         {/* Spacer for mobile navbar - only before footer */}
         <div className="pb-20 md:pb-0" />
-        
+
         <Footer scrollToSection={scrollToSection} />
 
         {/* Contact Sheet */}
@@ -306,11 +228,11 @@ const App: React.FC = () => {
         {/* Project Case Study Sheet (Feature #5 Implementation) */}
         <Sheet open={!!selectedProject} onOpenChange={(open) => !open && setSelectedProject(null)}>
           <SheetContent className="w-full sm:max-w-3xl p-0 border-l-4 border-black dark:border-neo-dark-border">
-             {selectedProject && <ProjectCaseStudy project={selectedProject} />}
+            {selectedProject && <ProjectCaseStudy project={selectedProject} />}
           </SheetContent>
         </Sheet>
 
-        <CommandPalette 
+        <CommandPalette
           theme={theme}
           toggleTheme={toggleTheme}
           scrollToSection={scrollToSection}
@@ -322,14 +244,14 @@ const App: React.FC = () => {
 
         <ScrollToTopButton />
         <ChatAssistant isOpen={isChatOpen} setIsOpen={setIsChatOpen} />
-        
+
         {/* New Mobile Bottom Navigation */}
-        <MobileNavBar 
+        <MobileNavBar
           activeSection={activeSection}
           scrollToSection={scrollToSection}
           openCommandPalette={() => setIsCmdPaletteOpen(true)}
         />
-        
+
         <ToastNotification
           message={toast.message}
           isVisible={toast.visible}
